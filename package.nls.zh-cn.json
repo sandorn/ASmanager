@@ -22,6 +22,7 @@
     "command.removeSource.title": "ASmanager: 移除来源",
     "command.showSyncRecords.title": "智能体技能: 显示同步记录",
     "command.clearSyncRecords.title": "智能体技能: 清除同步记录",
+    "command.cleanupLegacySyncs.title": "智能体技能: 清理遗留同步",
     "command.detectMcp.title": "ASmanager: 检测 MCP 服务器",
     "command.toggleMcpServer.title": "ASmanager: 切换 MCP 服务器状态",
     "command.syncMcpServer.title": "ASmanager: 同步 MCP 服务器",

@@ -244,6 +244,7 @@ export async function activate(
             case 'healthCheckMcp':
             case 'showSyncRecords':
             case 'syncSkillToAgents':
+            case 'cleanupLegacySyncs':
                 await vscode.commands.executeCommand(
                     `agentSkillsManager.${command}`,
                 );
@@ -536,12 +537,17 @@ export async function activate(
                 let synced = 0;
                 for (const target of targets) {
                     const agent = target.agent as AgentInfo;
-                    const destPath =
+                    const basePath =
                         agent.candidatePaths.find((p) => p.length > 0) ||
                         agent.candidatePaths[0];
-                    if (!destPath) {
+                    if (!basePath) {
                         continue;
                     }
+
+                    // 按智能体约定的 skills 子目录拼接最终同步目标
+                    const destPath = agent.skillsSubPath
+                        ? path.join(basePath, agent.skillsSubPath)
+                        : basePath;
 
                     try {
                         await syncManager.copySkill(
@@ -1494,6 +1500,43 @@ export async function activate(
                 await syncManager.clearRecords();
                 vscode.window.showInformationMessage(
                     localize('Sync records cleared.', '同步记录已清除。'),
+                );
+            },
+        ),
+        vscode.commands.registerCommand(
+            'agentSkillsManager.cleanupLegacySyncs',
+            async () => {
+                const records = syncManager.getRecords();
+                if (records.length === 0) {
+                    vscode.window.showInformationMessage(
+                        localize(
+                            'No sync records found. Nothing to clean up.',
+                            '没有同步记录，无需清理。',
+                        ),
+                    );
+                    return;
+                }
+
+                const choice = await vscode.window.showWarningMessage(
+                    localize(
+                        'Clean up legacy syncs? This will remove skills that were synced to the wrong location (e.g. directly in agent root instead of the "skills" subdirectory). Sync records for those will also be removed.',
+                        '清理遗留同步？这将移除被同步到错误位置的技能（例如直接放在智能体根目录而非 "skills" 子目录下的），同时清除对应记录。',
+                    ),
+                    { modal: true },
+                    localize('Clean Up', '清理'),
+                );
+
+                if (choice !== localize('Clean Up', '清理')) {
+                    return;
+                }
+
+                const cleaned =
+                    await syncManager.cleanupLegacySyncs(cachedAgents);
+                vscode.window.showInformationMessage(
+                    localize(
+                        `Cleaned up ${cleaned} legacy sync(s). You can now re-sync skills to the correct locations.`,
+                        `已清理 ${cleaned} 个遗留同步。现在可以重新将技能同步到正确位置。`,
+                    ),
                 );
             },
         ),

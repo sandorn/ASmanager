@@ -28,76 +28,52 @@ export class AgentDetector {
                     path.join(home, '.claude'),
                     path.join(home, '.config', 'claude'),
                 ],
+                skillsSubPath: 'skills',
             },
             {
                 id: 'codex',
                 name: 'Codex',
                 candidatePaths: [path.join(home, '.codex')],
+                skillsSubPath: 'skills',
             },
             {
                 id: 'opencode',
                 name: 'OpenCode',
-                candidatePaths: [
-                    path.join(home, '.opencode'),
-                    path.join(appData, 'opencode'),
-                ],
+                candidatePaths: [path.join(home, '.config', 'opencode')],
+                skillsSubPath: 'skills',
             },
             {
                 id: 'cursor',
                 name: 'Cursor',
                 candidatePaths: [
-                    path.join(appData, 'Cursor'),
                     path.join(userProfile, '.cursor'),
+                    path.join(appData, 'Cursor'),
                 ],
+                skillsSubPath: 'skills',
             },
             {
                 id: 'gemini-cli',
                 name: 'Gemini CLI',
                 candidatePaths: [path.join(home, '.gemini')],
+                skillsSubPath: 'skills',
             },
             {
                 id: 'copilot',
                 name: 'Copilot',
-                candidatePaths: [
-                    path.join(appData, 'Code', 'User', 'prompts'),
-                    path.join(appData, 'Code', 'User'),
-                ],
+                candidatePaths: [path.join(home, '.copilot')],
+                skillsSubPath: 'skills',
             },
             {
                 id: 'cline',
                 name: 'Cline',
-                candidatePaths: [
-                    path.join(
-                        appData,
-                        'Code',
-                        'User',
-                        'globalStorage',
-                        'saoudrizwan.claude-dev',
-                    ),
-                ],
+                candidatePaths: [path.join(home, '.cline')],
+                skillsSubPath: 'skills',
             },
             {
                 id: 'roo-code',
                 name: 'Roo Code',
-                candidatePaths: [
-                    path.join(
-                        appData,
-                        'Code',
-                        'User',
-                        'globalStorage',
-                        'rooveterinaryinc.roo-cline',
-                    ),
-                ],
-            },
-            {
-                id: 'kimi',
-                name: 'Kimi',
-                candidatePaths: [path.join(home, '.kimi')],
-            },
-            {
-                id: 'qwen',
-                name: 'Qwen',
-                candidatePaths: [path.join(home, '.qwen')],
+                candidatePaths: [path.join(home, '.roo')],
+                skillsSubPath: 'skills',
             },
         ];
 

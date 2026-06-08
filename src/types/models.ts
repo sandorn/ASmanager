@@ -20,6 +20,8 @@ export interface AgentInfo {
     detected: boolean;
     detail: string;
     candidatePaths: string[];
+    /** 技能在智能体配置目录下的子路径，如 "skills"。为空字符串则直接同步到配置根目录。 */
+    skillsSubPath: string;
 }
 
 export interface SourceInfo {

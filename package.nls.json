@@ -22,6 +22,7 @@
     "command.removeSource.title": "ASmanager: Remove Source",
     "command.showSyncRecords.title": "Agent Skills: Show Sync Records",
     "command.clearSyncRecords.title": "Agent Skills: Clear Sync Records",
+    "command.cleanupLegacySyncs.title": "Agent Skills: Clean Up Legacy Syncs",
     "command.detectMcp.title": "ASmanager: Detect MCP Servers",
     "command.toggleMcpServer.title": "ASmanager: Toggle MCP Server",
     "command.syncMcpServer.title": "ASmanager: Sync MCP Server",

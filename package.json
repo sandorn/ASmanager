@@ -142,6 +142,11 @@
                 "icon": "$(clear-all)"
             },
             {
+                "command": "agentSkillsManager.cleanupLegacySyncs",
+                "title": "%command.cleanupLegacySyncs.title%",
+                "icon": "$(clear-all)"
+            },
+            {
                 "command": "agentSkillsManager.detectMcp",
                 "title": "%command.detectMcp.title%",
                 "icon": "$(server)"
