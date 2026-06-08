@@ -1212,8 +1212,18 @@ export async function activate(
                         ),
                         cancellable: false,
                     },
-                    async () => {
-                        await getSourceManager().updateAll(sources);
+                    async (progress) => {
+                        await getSourceManager().updateAll(
+                            sources,
+                            (url, index, total) => {
+                                progress.report({
+                                    message: localize(
+                                        `${index}/${total}: ${url}`,
+                                        `${index}/${total}：${url}`,
+                                    ),
+                                });
+                            },
+                        );
                     },
                 );
 
@@ -1254,8 +1264,18 @@ export async function activate(
                         ),
                         cancellable: false,
                     },
-                    async () => {
-                        await manager.updateAll(sourceUrls);
+                    async (progress) => {
+                        await manager.updateAll(
+                            sourceUrls,
+                            (url, index, total) => {
+                                progress.report({
+                                    message: localize(
+                                        `${index}/${total}: ${url}`,
+                                        `${index}/${total}：${url}`,
+                                    ),
+                                });
+                            },
+                        );
                     },
                 );
 

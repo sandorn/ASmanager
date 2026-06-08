@@ -14,6 +14,7 @@ import {
 import { localize } from './localization';
 
 const execFileAsync = promisify(execFile);
+const gitTimeoutMs = 5 * 60 * 1000;
 
 function sourceFolderName(url: string): string {
     const readable = url
@@ -80,11 +81,15 @@ export class SourceManager {
         const localPath = this.getLocalPath(url);
 
         if (await fileExists(path.join(localPath, '.git'))) {
-            await execFileAsync('git', ['-C', localPath, 'pull', '--ff-only']);
+            await execFileAsync('git', ['-C', localPath, 'pull', '--ff-only'], {
+                timeout: gitTimeoutMs,
+            });
             return localPath;
         }
 
-        await execFileAsync('git', ['clone', '--depth', '1', url, localPath]);
+        await execFileAsync('git', ['clone', '--depth', '1', url, localPath], {
+            timeout: gitTimeoutMs,
+        });
         return localPath;
     }
 
@@ -135,10 +140,24 @@ export class SourceManager {
         }
     }
 
-    async updateAll(urls: string[]): Promise<string[]> {
+    async updateAll(
+        urls: string[],
+        onProgress?: (url: string, index: number, total: number) => void,
+    ): Promise<string[]> {
         const updated: string[] = [];
-        for (const url of urls) {
-            updated.push(await this.update(url));
+        for (let index = 0; index < urls.length; index += 1) {
+            const url = urls[index];
+            onProgress?.(url, index + 1, urls.length);
+            try {
+                updated.push(await this.update(url));
+            } catch (error) {
+                throw new Error(
+                    localize(
+                        `Failed to update ${url}: ${String(error)}`,
+                        `更新 ${url} 失败：${String(error)}`,
+                    ),
+                );
+            }
         }
         return updated;
     }
