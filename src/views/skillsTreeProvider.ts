@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { SkillInfo } from '../types/models';
 import { formatBytes } from '../services/config';
+import { t } from '../services/localization';
 import { SimpleTreeNode } from './treeNode';
 
 export class SkillsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNode> {
@@ -23,8 +24,8 @@ export class SkillsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
             if (this.skills.length === 0) {
                 return [
                     new SimpleTreeNode('message', {
-                        label: 'No skills found',
-                        description: 'Initialize or add skills',
+                        label: t('noSkillsFound'),
+                        description: t('initializeOrAddSkills'),
                         icon: new vscode.ThemeIcon('info'),
                     }),
                 ];
@@ -40,7 +41,7 @@ export class SkillsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
 
                 return new SimpleTreeNode('skill', {
                     label: `${skill.name}  [${skill.score}/10]`,
-                    description: `${skill.fileCount} files, ${formatBytes(skill.sizeBytes)}`,
+                    description: `${skill.fileCount} ${t('files')}, ${formatBytes(skill.sizeBytes)}`,
                     tooltip: `${skill.description}\n${skill.path}`,
                     icon,
                     contextValue: 'skill',
@@ -60,15 +61,15 @@ export class SkillsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
 
         children.push(
             new SimpleTreeNode('message', {
-                label: `Path: ${skill.path}`,
+                label: `${t('path')}: ${skill.path}`,
                 icon: new vscode.ThemeIcon('folder'),
             }),
             new SimpleTreeNode('message', {
-                label: `Score: ${skill.score}/10 | Files: ${skill.fileCount} | Size: ${formatBytes(skill.sizeBytes)}`,
+                label: `${t('score')}: ${skill.score}/10 | ${t('files')}: ${skill.fileCount} | ${t('size')}: ${formatBytes(skill.sizeBytes)}`,
                 icon: new vscode.ThemeIcon('file'),
             }),
             new SimpleTreeNode('message', {
-                label: `Updated: ${skill.updatedAt.toLocaleString()}`,
+                label: `${t('updated')}: ${skill.updatedAt.toLocaleString()}`,
                 icon: new vscode.ThemeIcon('calendar'),
             }),
         );
@@ -76,7 +77,7 @@ export class SkillsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
         if (skill.issues.length > 0) {
             children.push(
                 new SimpleTreeNode('message', {
-                    label: `Issues (${skill.issues.length})`,
+                    label: `${t('issues')} (${skill.issues.length})`,
                     icon: new vscode.ThemeIcon('warning'),
                     description: skill.issues.join('; '),
                     tooltip: skill.issues.join('\n'),

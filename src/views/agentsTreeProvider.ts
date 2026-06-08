@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { AgentInfo } from '../types/models';
+import { t } from '../services/localization';
 import { SimpleTreeNode } from './treeNode';
 
 export class AgentsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNode> {
@@ -20,8 +21,8 @@ export class AgentsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
         if (this.agents.length === 0) {
             return [
                 new SimpleTreeNode('message', {
-                    label: 'Agents not detected yet',
-                    description: 'Run detect command',
+                    label: t('agentsNotDetectedYet'),
+                    description: t('runDetectCommand'),
                     icon: new vscode.ThemeIcon('search'),
                 }),
             ];
@@ -31,7 +32,9 @@ export class AgentsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
             (agent) =>
                 new SimpleTreeNode('agent', {
                     label: agent.name,
-                    description: agent.detected ? 'Detected' : 'Not detected',
+                    description: agent.detected
+                        ? t('detected')
+                        : t('notDetected'),
                     tooltip: `${agent.detail}\n${agent.candidatePaths.join('\n')}`,
                     icon: new vscode.ThemeIcon(
                         agent.detected ? 'pass' : 'circle-slash',

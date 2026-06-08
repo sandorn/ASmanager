@@ -11,6 +11,7 @@ import {
     findFilesByName,
     removePath,
 } from './fileSystem';
+import { localize } from './localization';
 
 const execFileAsync = promisify(execFile);
 
@@ -40,7 +41,7 @@ function parseDescription(markdown: string): string {
         .map((line) => line.trim())
         .find((line) => line && !line.startsWith('#') && !line.includes(':'));
 
-    return paragraph || 'No description found.';
+    return paragraph || localize('No description found.', '未找到描述。');
 }
 
 export class SourceManager {
@@ -63,8 +64,11 @@ export class SourceManager {
                 localPath,
                 installed,
                 detail: installed
-                    ? `Cached at ${localPath}`
-                    : 'Not fetched yet',
+                    ? localize(
+                          `Cached at ${localPath}`,
+                          `已缓存于 ${localPath}`,
+                      )
+                    : localize('Not fetched yet', '尚未拉取'),
             });
         }
 
@@ -90,7 +94,10 @@ export class SourceManager {
     }> {
         const localPath = this.getLocalPath(url);
         if (!(await fileExists(path.join(localPath, '.git')))) {
-            return { behind: false, detail: 'Not cloned yet' };
+            return {
+                behind: false,
+                detail: localize('Not cloned yet', '尚未克隆'),
+            };
         }
 
         try {
@@ -113,10 +120,18 @@ export class SourceManager {
             return {
                 behind: behind > 0,
                 detail:
-                    behind > 0 ? `${behind} commit(s) behind` : 'Up to date',
+                    behind > 0
+                        ? localize(
+                              `${behind} commit(s) behind`,
+                              `落后 ${behind} 个提交`,
+                          )
+                        : localize('Up to date', '已是最新'),
             };
         } catch {
-            return { behind: false, detail: 'Could not check' };
+            return {
+                behind: false,
+                detail: localize('Could not check', '无法检查'),
+            };
         }
     }
 

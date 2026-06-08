@@ -8,6 +8,7 @@ import {
     listDirectories,
     removePath,
 } from './fileSystem';
+import { localize } from './localization';
 
 function parseSkillMarkdown(
     markdown: string,
@@ -55,15 +56,18 @@ function parseSkillMarkdown(
             .find(
                 (line) => line && !line.startsWith('#') && !line.includes(':'),
             );
-        description = paragraph || 'No description found.';
+        description =
+            paragraph || localize('No description found.', '未找到描述。');
     }
 
     if (!nameMatch) {
-        issues.push('Missing explicit skill name.');
+        issues.push(
+            localize('Missing explicit skill name.', '缺少明确的技能名称。'),
+        );
     }
 
-    if (description === 'No description found.') {
-        issues.push('Missing description.');
+    if (description === localize('No description found.', '未找到描述。')) {
+        issues.push(localize('Missing description.', '缺少描述。'));
     }
 
     return { name, description, issues, tags, category };
@@ -97,14 +101,17 @@ export class SkillRepository {
             if (!(await fileExists(skillFile))) {
                 skills.push({
                     name: path.basename(directory),
-                    description: 'SKILL.md not found.',
+                    description: localize(
+                        'SKILL.md not found.',
+                        '未找到 SKILL.md。',
+                    ),
                     path: directory,
                     skillFile,
                     fileCount: 0,
                     sizeBytes: 0,
                     updatedAt: new Date(0),
                     status: 'error',
-                    issues: ['Missing SKILL.md.'],
+                    issues: [localize('Missing SKILL.md.', '缺少 SKILL.md。')],
                     tags: [],
                     category: '',
                     score: 0,
@@ -121,12 +128,21 @@ export class SkillRepository {
 
             const stats = await getDirectoryStats(directory);
             if (stats.fileCount === 0) {
-                issues.push('Skill directory is empty.');
+                issues.push(
+                    localize('Skill directory is empty.', '技能目录为空。'),
+                );
             }
 
             const status = issues.length > 0 ? 'warning' : 'ready';
-            const hasName = !issues.includes('Missing explicit skill name.');
-            const hasDesc = !issues.includes('Missing description.');
+            const hasName = !issues.includes(
+                localize(
+                    'Missing explicit skill name.',
+                    '缺少明确的技能名称。',
+                ),
+            );
+            const hasDesc = !issues.includes(
+                localize('Missing description.', '缺少描述。'),
+            );
             const score =
                 Math.round(
                     ((hasName ? 30 : 0) +

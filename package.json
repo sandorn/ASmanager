@@ -1,7 +1,7 @@
 {
     "name": "asmanager",
     "displayName": "ASmanager",
-    "description": "Manage local AI Agent skills and MCP assets from a central repository.",
+    "description": "%extension.description%",
     "version": "0.0.1",
     "publisher": "Sandhill",
     "license": "SEE LICENSE IN LICENSE",
@@ -19,7 +19,7 @@
                 "agentSkillsManager.centralRepository": {
                     "type": "string",
                     "default": "~/.agents/skills",
-                    "description": "Central repository path for AI Agent skills."
+                    "description": "%config.centralRepository.description%"
                 },
                 "agentSkillsManager.sources": {
                     "type": "array",
@@ -32,7 +32,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "GitHub or remote skill source URLs."
+                    "description": "%config.sources.description%"
                 }
             }
         },
@@ -40,7 +40,7 @@
             "activitybar": [
                 {
                     "id": "agentSkillsManager",
-                    "title": "Agent Skills",
+                    "title": "%viewsContainer.agentSkillsManager.title%",
                     "icon": "$(tools)"
                 }
             ]
@@ -49,166 +49,166 @@
             "agentSkillsManager": [
                 {
                     "id": "agentSkillsManager.skills",
-                    "name": "Skills"
+                    "name": "%view.skills.name%"
                 },
                 {
                     "id": "agentSkillsManager.agents",
-                    "name": "Agents"
+                    "name": "%view.agents.name%"
                 },
                 {
                     "id": "agentSkillsManager.sources",
-                    "name": "Sources"
+                    "name": "%view.sources.name%"
                 },
                 {
                     "id": "agentSkillsManager.mcp",
-                    "name": "MCP Servers"
+                    "name": "%view.mcp.name%"
                 }
             ]
         },
         "commands": [
             {
                 "command": "agentSkillsManager.initializeRepository",
-                "title": "ASmanager: Initialize Repository",
+                "title": "%command.initializeRepository.title%",
                 "icon": "$(repo-create)"
             },
             {
                 "command": "agentSkillsManager.refresh",
-                "title": "ASmanager: Refresh",
+                "title": "%command.refresh.title%",
                 "icon": "$(refresh)"
             },
             {
                 "command": "agentSkillsManager.openRepository",
-                "title": "ASmanager: Open Repository",
+                "title": "%command.openRepository.title%",
                 "icon": "$(folder-opened)"
             },
             {
                 "command": "agentSkillsManager.openManager",
-                "title": "ASmanager: Open Manager",
+                "title": "%command.openManager.title%",
                 "icon": "$(dashboard)"
             },
             {
                 "command": "agentSkillsManager.addSource",
-                "title": "ASmanager: Add Source",
+                "title": "%command.addSource.title%",
                 "icon": "$(add)"
             },
             {
                 "command": "agentSkillsManager.updateSources",
-                "title": "ASmanager: Update Sources",
+                "title": "%command.updateSources.title%",
                 "icon": "$(cloud-download)"
             },
             {
                 "command": "agentSkillsManager.installSkillFromSource",
-                "title": "ASmanager: Install Skill From Source",
+                "title": "%command.installSkillFromSource.title%",
                 "icon": "$(cloud-download)"
             },
             {
                 "command": "agentSkillsManager.detectAgents",
-                "title": "ASmanager: Detect Agents",
+                "title": "%command.detectAgents.title%",
                 "icon": "$(search)"
             },
             {
                 "command": "agentSkillsManager.diagnoseSkills",
-                "title": "ASmanager: Diagnose Skills",
+                "title": "%command.diagnoseSkills.title%",
                 "icon": "$(pulse)"
             },
             {
                 "command": "agentSkillsManager.syncSkill",
-                "title": "ASmanager: Sync Skill",
+                "title": "%command.syncSkill.title%",
                 "icon": "$(sync)"
             },
             {
                 "command": "agentSkillsManager.syncSkillToAgents",
-                "title": "ASmanager: Sync Skill to Agents",
+                "title": "%command.syncSkillToAgents.title%",
                 "icon": "$(sync-ignored)"
             },
             {
                 "command": "agentSkillsManager.deleteSkill",
-                "title": "ASmanager: Delete Skill",
+                "title": "%command.deleteSkill.title%",
                 "icon": "$(trash)"
             },
             {
                 "command": "agentSkillsManager.removeSource",
-                "title": "ASmanager: Remove Source",
+                "title": "%command.removeSource.title%",
                 "icon": "$(trash)"
             },
             {
                 "command": "agentSkillsManager.showSyncRecords",
-                "title": "Agent Skills: Show Sync Records",
+                "title": "%command.showSyncRecords.title%",
                 "icon": "$(history)"
             },
             {
                 "command": "agentSkillsManager.clearSyncRecords",
-                "title": "Agent Skills: Clear Sync Records",
+                "title": "%command.clearSyncRecords.title%",
                 "icon": "$(clear-all)"
             },
             {
                 "command": "agentSkillsManager.detectMcp",
-                "title": "ASmanager: Detect MCP Servers",
+                "title": "%command.detectMcp.title%",
                 "icon": "$(server)"
             },
             {
                 "command": "agentSkillsManager.toggleMcpServer",
-                "title": "ASmanager: Toggle MCP Server",
+                "title": "%command.toggleMcpServer.title%",
                 "icon": "$(debug-start)"
             },
             {
                 "command": "agentSkillsManager.syncMcpServer",
-                "title": "ASmanager: Sync MCP Server",
+                "title": "%command.syncMcpServer.title%",
                 "icon": "$(sync)"
             },
             {
                 "command": "agentSkillsManager.backupRepository",
-                "title": "ASmanager: Backup Repository",
+                "title": "%command.backupRepository.title%",
                 "icon": "$(export)"
             },
             {
                 "command": "agentSkillsManager.restoreRepository",
-                "title": "ASmanager: Restore Repository",
+                "title": "%command.restoreRepository.title%",
                 "icon": "$(folder-opened)"
             },
             {
                 "command": "agentSkillsManager.renameSkill",
-                "title": "ASmanager: Rename Skill",
+                "title": "%command.renameSkill.title%",
                 "icon": "$(edit)"
             },
             {
                 "command": "agentSkillsManager.editSkillMarkdown",
-                "title": "ASmanager: Edit Skill Markdown",
+                "title": "%command.editSkillMarkdown.title%",
                 "icon": "$(edit)"
             },
             {
                 "command": "agentSkillsManager.showSourceSkills",
-                "title": "ASmanager: Show Source Skills",
+                "title": "%command.showSourceSkills.title%",
                 "icon": "$(list-tree)"
             },
             {
                 "command": "agentSkillsManager.installAllFromSource",
-                "title": "ASmanager: Install All From Source",
+                "title": "%command.installAllFromSource.title%",
                 "icon": "$(cloud-download)"
             },
             {
                 "command": "agentSkillsManager.rollbackSync",
-                "title": "ASmanager: Rollback Sync",
+                "title": "%command.rollbackSync.title%",
                 "icon": "$(debug-reverse-continue)"
             },
             {
                 "command": "agentSkillsManager.healthCheckMcp",
-                "title": "ASmanager: Health Check MCP Servers",
+                "title": "%command.healthCheckMcp.title%",
                 "icon": "$(pulse)"
             },
             {
                 "command": "agentSkillsManager.checkSourceUpdates",
-                "title": "ASmanager: Check Source Updates",
+                "title": "%command.checkSourceUpdates.title%",
                 "icon": "$(sync)"
             },
             {
                 "command": "agentSkillsManager.exportConfig",
-                "title": "ASmanager: Export Config",
+                "title": "%command.exportConfig.title%",
                 "icon": "$(export)"
             },
             {
                 "command": "agentSkillsManager.importConfig",
-                "title": "ASmanager: Import Config",
+                "title": "%command.importConfig.title%",
                 "icon": "$(folder-opened)"
             }
         ],

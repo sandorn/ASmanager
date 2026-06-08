@@ -7,6 +7,7 @@ import {
     SyncRecord,
 } from '../types/models';
 import { formatBytes } from '../services/config';
+import { isChineseLanguage, t } from '../services/localization';
 
 export interface DashboardData {
     repositoryPath: string;
@@ -32,20 +33,20 @@ function statusClass(value: string): string {
 
 function renderSkillRows(skills: SkillInfo[]): string {
     if (skills.length === 0) {
-        return '<tr><td colspan="7" class="empty">No skills found.</td></tr>';
+        return `<tr><td colspan="7" class="empty">${t('noSkillsFoundTable')}</td></tr>`;
     }
 
     return skills
         .map(
             (skill) => `
                 <tr>
-                    <td><strong>${escapeHtml(skill.name)}</strong><span>${escapeHtml(skill.description)}${skill.category ? ` [${escapeHtml(skill.category)}]` : ''}${skill.tags.length > 0 ? ` Tags: ${escapeHtml(skill.tags.join(', '))}` : ''}</span></td>
+                    <td><strong>${escapeHtml(skill.name)}</strong><span>${escapeHtml(skill.description)}${skill.category ? ` [${escapeHtml(skill.category)}]` : ''}${skill.tags.length > 0 ? ` ${t('tags')}: ${escapeHtml(skill.tags.join(', '))}` : ''}</span></td>
                     <td><span class="badge ${statusClass(skill.status)}">${escapeHtml(skill.status)}</span></td>
                     <td><span class="badge muted">${skill.score}/10</span></td>
                     <td>${skill.fileCount}</td>
                     <td>${formatBytes(skill.sizeBytes)}</td>
                     <td title="${escapeHtml(skill.path)}">${escapeHtml(skill.path)}</td>
-                    <td><button data-command="deleteSkill" data-payload="${escapeHtml(JSON.stringify({ path: skill.path, name: skill.name }))}" class="secondary small">Delete</button></td>
+                    <td><button data-command="deleteSkill" data-payload="${escapeHtml(JSON.stringify({ path: skill.path, name: skill.name }))}" class="secondary small">${t('delete')}</button></td>
                 </tr>`,
         )
         .join('');
@@ -53,7 +54,7 @@ function renderSkillRows(skills: SkillInfo[]): string {
 
 function renderSourceRows(sources: SourceInfo[]): string {
     if (sources.length === 0) {
-        return '<tr><td colspan="4" class="empty">No sources configured.</td></tr>';
+        return `<tr><td colspan="4" class="empty">${t('noSourcesConfiguredTable')}</td></tr>`;
     }
 
     return sources
@@ -61,9 +62,9 @@ function renderSourceRows(sources: SourceInfo[]): string {
             (source) => `
                 <tr>
                     <td><strong>${escapeHtml(source.url)}</strong><span>${escapeHtml(source.localPath ?? '')}</span></td>
-                    <td><span class="badge ${source.installed ? 'ready' : 'warning'}">${source.installed ? 'Cached' : 'Not fetched'}</span></td>
+                    <td><span class="badge ${source.installed ? 'ready' : 'warning'}">${source.installed ? t('cached') : t('notFetched')}</span></td>
                     <td>${escapeHtml(source.detail ?? '')}</td>
-                    <td><button data-command="removeSource" data-payload="${escapeHtml(JSON.stringify({ url: source.url }))}" class="secondary small">Remove</button></td>
+                    <td><button data-command="removeSource" data-payload="${escapeHtml(JSON.stringify({ url: source.url }))}" class="secondary small">${t('remove')}</button></td>
                 </tr>`,
         )
         .join('');
@@ -71,7 +72,7 @@ function renderSourceRows(sources: SourceInfo[]): string {
 
 function renderAgentRows(agents: AgentInfo[]): string {
     if (agents.length === 0) {
-        return '<tr><td colspan="3" class="empty">Agents not detected yet.</td></tr>';
+        return `<tr><td colspan="3" class="empty">${t('agentsNotDetectedTable')}</td></tr>`;
     }
 
     return agents
@@ -79,7 +80,7 @@ function renderAgentRows(agents: AgentInfo[]): string {
             (agent) => `
                 <tr>
                     <td><strong>${escapeHtml(agent.name)}</strong><span>${escapeHtml(agent.id)}</span></td>
-                    <td><span class="badge ${agent.detected ? 'ready' : 'muted'}">${agent.detected ? 'Detected' : 'Not detected'}</span></td>
+                    <td><span class="badge ${agent.detected ? 'ready' : 'muted'}">${agent.detected ? t('detected') : t('notDetected')}</span></td>
                     <td>${escapeHtml(agent.detail)}</td>
                 </tr>`,
         )
@@ -88,7 +89,7 @@ function renderAgentRows(agents: AgentInfo[]): string {
 
 function renderRecordRows(records: SyncRecord[]): string {
     if (records.length === 0) {
-        return '<tr><td colspan="4" class="empty">No sync records yet.</td></tr>';
+        return `<tr><td colspan="4" class="empty">${t('noSyncRecordsYet')}</td></tr>`;
     }
 
     return records
@@ -107,24 +108,31 @@ function renderRecordRows(records: SyncRecord[]): string {
 
 function renderMcpRows(servers: McpServerInfo[]): string {
     if (servers.length === 0) {
-        return '<tr><td colspan="6" class="empty">No MCP servers detected. Run Detect MCP.</td></tr>';
+        return `<tr><td colspan="6" class="empty">${t('noMcpServersTable')}</td></tr>`;
     }
 
     return servers
-        .map(
-            (server) => `
+        .map((server) => {
+            const healthClass = server.healthy
+                ? 'ready'
+                : server.healthDetail === 'Not checked' ||
+                    server.healthDetail === t('notChecked')
+                  ? 'muted'
+                  : 'error';
+
+            return `
                 <tr>
                     <td><strong>${escapeHtml(server.name)}</strong><span>${escapeHtml(server.toolName)}</span></td>
-                    <td><span class="badge ${server.disabled ? 'warning' : 'ready'}">${server.disabled ? 'Disabled' : 'Enabled'}</span></td>
-                    <td><span class="badge ${server.healthy ? 'ready' : server.healthDetail === 'Not checked' ? 'muted' : 'error'}">${escapeHtml(server.healthDetail)}</span></td>
+                    <td><span class="badge ${server.disabled ? 'warning' : 'ready'}">${server.disabled ? t('disabled') : t('enabled')}</span></td>
+                    <td><span class="badge ${healthClass}">${escapeHtml(server.healthDetail === 'Not checked' ? t('notChecked') : server.healthDetail)}</span></td>
                     <td>${escapeHtml(server.command)} ${escapeHtml(server.args.join(' '))}</td>
                     <td title="${escapeHtml(server.sourcePath)}">${escapeHtml(server.sourcePath)}</td>
                     <td>
-                        <button data-command="toggleMcpServer" data-payload="${escapeHtml(JSON.stringify({ name: server.name, sourcePath: server.sourcePath }))}" class="secondary small">${server.disabled ? 'Enable' : 'Disable'}</button>
-                        <button data-command="syncMcpServer" data-payload="${escapeHtml(JSON.stringify({ name: server.name, sourcePath: server.sourcePath }))}" class="secondary small">Sync</button>
+                        <button data-command="toggleMcpServer" data-payload="${escapeHtml(JSON.stringify({ name: server.name, sourcePath: server.sourcePath }))}" class="secondary small">${server.disabled ? t('enable') : t('disable')}</button>
+                        <button data-command="syncMcpServer" data-payload="${escapeHtml(JSON.stringify({ name: server.name, sourcePath: server.sourcePath }))}" class="secondary small">${t('sync')}</button>
                     </td>
-                </tr>`,
-        )
+                </tr>`;
+        })
         .join('');
 }
 
@@ -142,7 +150,7 @@ export function renderDashboard(
     ).length;
 
     return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${isChineseLanguage() ? 'zh-CN' : 'en'}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -217,46 +225,46 @@ export function renderDashboard(
                 <p title="${escapeHtml(data.repositoryPath)}">${escapeHtml(data.repositoryPath)}</p>
             </div>
             <div class="toolbar">
-                <button data-command="refresh">Refresh</button>
-                <button data-command="updateSources">Update Sources</button>
-                <button data-command="installSkillFromSource">Install Skill</button>
-                <button data-command="syncSkillToAgents">Sync to Agents</button>
-                <button data-command="detectAgents">Detect Agents</button>
-                <button data-command="backupRepository" class="secondary">Backup</button>
-                <button data-command="openRepository" class="secondary">Open Repository</button>
+                <button data-command="refresh">${t('refresh')}</button>
+                <button data-command="updateSources">${t('updateSources')}</button>
+                <button data-command="installSkillFromSource">${t('installSkill')}</button>
+                <button data-command="syncSkillToAgents">${t('syncToAgents')}</button>
+                <button data-command="detectAgents">${t('detectAgents')}</button>
+                <button data-command="backupRepository" class="secondary">${t('backup')}</button>
+                <button data-command="openRepository" class="secondary">${t('openRepository')}</button>
             </div>
         </header>
 
         <div class="metrics">
-            <div class="metric"><strong>${data.skills.length}</strong><span>Skills</span></div>
-            <div class="metric"><strong>${problemSkills}</strong><span>Skills needing review</span></div>
-            <div class="metric"><strong>${cachedSources}/${data.sources.length}</strong><span>Cached sources</span></div>
-            <div class="metric"><strong>${detectedAgents}/${data.agents.length}</strong><span>Detected agents</span></div>
+            <div class="metric"><strong>${data.skills.length}</strong><span>${t('skills')}</span></div>
+            <div class="metric"><strong>${problemSkills}</strong><span>${t('skillsNeedingReview')}</span></div>
+            <div class="metric"><strong>${cachedSources}/${data.sources.length}</strong><span>${t('cachedSources')}</span></div>
+            <div class="metric"><strong>${detectedAgents}/${data.agents.length}</strong><span>${t('detectedAgents')}</span></div>
         </div>
 
         <section>
-            <div class="section-head"><h2>Skills</h2><button data-command="diagnoseSkills" class="secondary">Diagnose</button></div>
-            <table><thead><tr><th>Skill</th><th>Status</th><th>Score</th><th>Files</th><th>Size</th><th>Path</th><th></th></tr></thead><tbody>${renderSkillRows(data.skills)}</tbody></table>
+            <div class="section-head"><h2>${t('skills')}</h2><button data-command="diagnoseSkills" class="secondary">${t('diagnose')}</button></div>
+            <table><thead><tr><th>${t('skill')}</th><th>${t('status')}</th><th>${t('score')}</th><th>${t('files')}</th><th>${t('size')}</th><th>${t('path')}</th><th></th></tr></thead><tbody>${renderSkillRows(data.skills)}</tbody></table>
         </section>
 
         <section>
-            <div class="section-head"><h2>Sources</h2><button data-command="addSource" class="secondary">Add Source</button></div>
-            <table><thead><tr><th>Source</th><th>Status</th><th>Detail</th><th></th></tr></thead><tbody>${renderSourceRows(data.sources)}</tbody></table>
+            <div class="section-head"><h2>${t('sources')}</h2><button data-command="addSource" class="secondary">${t('addSource')}</button></div>
+            <table><thead><tr><th>${t('sourceLabel')}</th><th>${t('status')}</th><th>${t('detail')}</th><th></th></tr></thead><tbody>${renderSourceRows(data.sources)}</tbody></table>
         </section>
 
         <section>
-            <div class="section-head"><h2>Agents</h2><button data-command="detectAgents" class="secondary">Detect</button></div>
-            <table><thead><tr><th>Agent</th><th>Status</th><th>Detail</th></tr></thead><tbody>${renderAgentRows(data.agents)}</tbody></table>
+            <div class="section-head"><h2>${t('agents')}</h2><button data-command="detectAgents" class="secondary">${t('detect')}</button></div>
+            <table><thead><tr><th>${t('agent')}</th><th>${t('status')}</th><th>${t('detail')}</th></tr></thead><tbody>${renderAgentRows(data.agents)}</tbody></table>
         </section>
 
         <section>
-            <div class="section-head"><h2>MCP Servers</h2><button data-command="detectMcp" class="secondary">Detect MCP</button><button data-command="healthCheckMcp" class="secondary">Health Check</button></div>
-            <table><thead><tr><th>Server</th><th>Status</th><th>Health</th><th>Command</th><th>Source</th><th></th></tr></thead><tbody>${renderMcpRows(data.mcpServers)}</tbody></table>
+            <div class="section-head"><h2>${t('mcpServers')}</h2><button data-command="detectMcp" class="secondary">${t('detectMcp')}</button><button data-command="healthCheckMcp" class="secondary">${t('healthCheck')}</button></div>
+            <table><thead><tr><th>${t('server')}</th><th>${t('status')}</th><th>${t('health')}</th><th>${t('command')}</th><th>${t('sourceLabel')}</th><th></th></tr></thead><tbody>${renderMcpRows(data.mcpServers)}</tbody></table>
         </section>
 
         <section>
-            <div class="section-head"><h2>Recent Syncs</h2><button data-command="showSyncRecords" class="secondary">Open Records</button></div>
-            <table><thead><tr><th>Skill</th><th>Mode</th><th>Destination</th><th>Time</th></tr></thead><tbody>${renderRecordRows(data.syncRecords)}</tbody></table>
+            <div class="section-head"><h2>${t('recentSyncs')}</h2><button data-command="showSyncRecords" class="secondary">${t('openRecords')}</button></div>
+            <table><thead><tr><th>${t('skill')}</th><th>${t('mode')}</th><th>${t('destination')}</th><th>${t('time')}</th></tr></thead><tbody>${renderRecordRows(data.syncRecords)}</tbody></table>
         </section>
     </div>
     <script nonce="${nonce}">

@@ -5,6 +5,7 @@ import * as path from 'node:path';
 import { promisify } from 'node:util';
 import { McpServerInfo } from '../types/models';
 import { fileExists, readJsonFile, writeJsonFile } from './fileSystem';
+import { localize, t } from './localization';
 
 const execFileAsync = promisify(execFile);
 
@@ -124,7 +125,7 @@ function normalizeServers(
         toolId,
         toolName,
         healthy: false,
-        healthDetail: 'Not checked',
+        healthDetail: t('notChecked'),
     }));
 }
 
@@ -214,7 +215,10 @@ export class McpManager {
                 env: { ...process.env, ...server.env },
             });
             server.healthy = true;
-            server.healthDetail = 'Responds to --version';
+            server.healthDetail = localize(
+                'Responds to --version',
+                '响应 --version',
+            );
         } catch {
             try {
                 await execFileAsync(server.command, ['--help'], {
@@ -222,10 +226,16 @@ export class McpManager {
                     env: { ...process.env, ...server.env },
                 });
                 server.healthy = true;
-                server.healthDetail = 'Responds to --help';
+                server.healthDetail = localize(
+                    'Responds to --help',
+                    '响应 --help',
+                );
             } catch {
                 server.healthy = false;
-                server.healthDetail = 'Unreachable or timed out';
+                server.healthDetail = localize(
+                    'Unreachable or timed out',
+                    '无法访问或已超时',
+                );
             }
         }
 

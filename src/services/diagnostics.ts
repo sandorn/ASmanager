@@ -1,4 +1,5 @@
 import { DiagnosticIssue, SkillInfo } from '../types/models';
+import { localize } from './localization';
 
 function tokenize(text: string): Set<string> {
     return new Set(
@@ -47,7 +48,10 @@ export class DiagnosticsService {
                 issues.push({
                     skillName: skill.name,
                     severity: 'warning',
-                    message: `Contains ${skill.fileCount} files; review whether large assets should be included.`,
+                    message: localize(
+                        `Contains ${skill.fileCount} files; review whether large assets should be included.`,
+                        `包含 ${skill.fileCount} 个文件；请检查是否应包含大型资源。`,
+                    ),
                 });
             }
         }
@@ -62,7 +66,10 @@ export class DiagnosticsService {
                     issues.push({
                         skillName: `${skills[i].name} / ${skills[j].name}`,
                         severity: sim >= 0.85 ? 'warning' : 'info',
-                        message: `Descriptions are ${(sim * 100).toFixed(0)}% similar (Jaccard). Review possible overlap.`,
+                        message: localize(
+                            `Descriptions are ${(sim * 100).toFixed(0)}% similar (Jaccard). Review possible overlap.`,
+                            `描述相似度为 ${(sim * 100).toFixed(0)}%（Jaccard）。请检查是否存在重叠。`,
+                        ),
                     });
                 }
 
@@ -74,7 +81,10 @@ export class DiagnosticsService {
                     issues.push({
                         skillName: `${skills[i].name} / ${skills[j].name}`,
                         severity: 'info',
-                        message: `Skill names are ${(nameSim * 100).toFixed(0)}% similar. Review possible duplication.`,
+                        message: localize(
+                            `Skill names are ${(nameSim * 100).toFixed(0)}% similar. Review possible duplication.`,
+                            `技能名称相似度为 ${(nameSim * 100).toFixed(0)}%。请检查是否重复。`,
+                        ),
                     });
                 }
             }

@@ -4,6 +4,7 @@ import { BackupService } from './services/backupService';
 import { AgentDetector } from './services/agentDetector';
 import { getCentralRepository, getConfiguredSources } from './services/config';
 import { DiagnosticsService } from './services/diagnostics';
+import { localize, t } from './services/localization';
 import { McpManager } from './services/mcpManager';
 import { SourceManager } from './services/sourceManager';
 import { SkillRepository } from './services/skillRepository';
@@ -86,7 +87,10 @@ export async function activate(
             (agent) => agent.detected,
         ).length;
         vscode.window.showInformationMessage(
-            `Detected ${detectedCount} of ${cachedAgents.length} supported agent targets.`,
+            localize(
+                `Detected ${detectedCount} of ${cachedAgents.length} supported agent targets.`,
+                `已检测到 ${detectedCount}/${cachedAgents.length} 个支持的智能体目标。`,
+            ),
         );
     }
 
@@ -119,11 +123,14 @@ export async function activate(
                 }
                 const skillName = String(payload.name || '');
                 const choice = await vscode.window.showWarningMessage(
-                    `Delete skill "${skillName}"? This will remove ${String(payload.path)}.`,
+                    localize(
+                        `Delete skill "${skillName}"? This will remove ${String(payload.path)}.`,
+                        `删除技能“${skillName}”？这将移除 ${String(payload.path)}。`,
+                    ),
                     { modal: true },
-                    'Delete',
+                    t('delete'),
                 );
-                if (choice !== 'Delete') {
+                if (choice !== t('delete')) {
                     return;
                 }
                 const repository = new SkillRepository(getCentralRepository());
@@ -135,11 +142,14 @@ export async function activate(
                     return;
                 }
                 const choice = await vscode.window.showWarningMessage(
-                    `Remove source "${String(payload.url)}"?`,
+                    localize(
+                        `Remove source "${String(payload.url)}"?`,
+                        `移除来源“${String(payload.url)}”？`,
+                    ),
                     { modal: true },
-                    'Remove',
+                    t('remove'),
                 );
-                if (choice !== 'Remove') {
+                if (choice !== t('remove')) {
                     return;
                 }
                 const configuration =
@@ -172,7 +182,10 @@ export async function activate(
                 cachedMcp = await mcpManager.detectAll();
                 mcpProvider.refresh(cachedMcp);
                 vscode.window.showInformationMessage(
-                    `${target.name} is now ${toggled ? 'enabled' : 'disabled'}.`,
+                    localize(
+                        `${target.name} is now ${toggled ? 'enabled' : 'disabled'}.`,
+                        `${target.name} 现在${toggled ? '已启用' : '已禁用'}。`,
+                    ),
                 );
                 break;
             }
@@ -195,7 +208,12 @@ export async function activate(
                         description: t.configPath,
                         target: t,
                     })),
-                    { title: `Sync ${source.name} to which config?` },
+                    {
+                        title: localize(
+                            `Sync ${source.name} to which config?`,
+                            `将 ${source.name} 同步到哪个配置？`,
+                        ),
+                    },
                 );
                 if (!targetPick) {
                     return;
@@ -205,7 +223,10 @@ export async function activate(
                     targetPick.target.configPath,
                 );
                 vscode.window.showInformationMessage(
-                    `Synced ${source.name} to ${targetPick.target.toolName}.`,
+                    localize(
+                        `Synced ${source.name} to ${targetPick.target.toolName}.`,
+                        `已将 ${source.name} 同步到 ${targetPick.target.toolName}。`,
+                    ),
                 );
                 break;
             }
@@ -294,7 +315,10 @@ export async function activate(
                 await repository.initialize();
                 await refreshAll();
                 vscode.window.showInformationMessage(
-                    `Agent skills repository is ready: ${repository.path}`,
+                    localize(
+                        `Agent skills repository is ready: ${repository.path}`,
+                        `智能体技能仓库已就绪：${repository.path}`,
+                    ),
                 );
             },
         ),
@@ -331,18 +355,24 @@ export async function activate(
                 const skill = node?.payload as SkillInfo | undefined;
                 if (!skill) {
                     vscode.window.showWarningMessage(
-                        'Select a skill from the Skills tree to delete.',
+                        localize(
+                            'Select a skill from the Skills tree to delete.',
+                            '请从技能树中选择要删除的技能。',
+                        ),
                     );
                     return;
                 }
 
                 const choice = await vscode.window.showWarningMessage(
-                    `Delete skill "${skill.name}"? This will remove ${skill.path}.`,
+                    localize(
+                        `Delete skill "${skill.name}"? This will remove ${skill.path}.`,
+                        `删除技能“${skill.name}”？这将移除 ${skill.path}。`,
+                    ),
                     { modal: true },
-                    'Delete',
+                    t('delete'),
                 );
 
-                if (choice !== 'Delete') {
+                if (choice !== t('delete')) {
                     return;
                 }
 
@@ -351,7 +381,10 @@ export async function activate(
                 await refreshAll();
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Deleted skill "${skill.name}".`,
+                    localize(
+                        `Deleted skill "${skill.name}".`,
+                        `已删除技能“${skill.name}”。`,
+                    ),
                 );
             },
         ),
@@ -361,18 +394,24 @@ export async function activate(
                 const source = node?.payload as SourceInfo | undefined;
                 if (!source?.url) {
                     vscode.window.showWarningMessage(
-                        'Select a source from the Sources tree to remove.',
+                        localize(
+                            'Select a source from the Sources tree to remove.',
+                            '请从来源树中选择要移除的来源。',
+                        ),
                     );
                     return;
                 }
 
                 const choice = await vscode.window.showWarningMessage(
-                    `Remove source "${source.url}"?`,
+                    localize(
+                        `Remove source "${source.url}"?`,
+                        `移除来源“${source.url}”？`,
+                    ),
                     { modal: true },
-                    'Remove',
+                    t('remove'),
                 );
 
-                if (choice !== 'Remove') {
+                if (choice !== t('remove')) {
                     return;
                 }
 
@@ -390,7 +429,10 @@ export async function activate(
                 await refreshAll();
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Removed source "${source.url}".`,
+                    localize(
+                        `Removed source "${source.url}".`,
+                        `已移除来源“${source.url}”。`,
+                    ),
                 );
             },
         ),
@@ -412,7 +454,12 @@ export async function activate(
                         description: item.description,
                         skill: item,
                     })),
-                    { title: 'Select a skill to bulk-sync' },
+                    {
+                        title: localize(
+                            'Select a skill to bulk-sync',
+                            '选择要批量同步的技能',
+                        ),
+                    },
                 );
 
                 const skill = selected?.skill as SkillInfo | undefined;
@@ -425,7 +472,10 @@ export async function activate(
                 );
                 if (detectedAgents.length === 0) {
                     vscode.window.showWarningMessage(
-                        'No agents detected. Run Detect Agents first.',
+                        localize(
+                            'No agents detected. Run Detect Agents first.',
+                            '未检测到智能体。请先运行检测智能体。',
+                        ),
                     );
                     return;
                 }
@@ -438,7 +488,10 @@ export async function activate(
                     })),
                     {
                         canPickMany: true,
-                        title: 'Select target agents to sync',
+                        title: localize(
+                            'Select target agents to sync',
+                            '选择要同步的目标智能体',
+                        ),
                     },
                 );
 
@@ -449,22 +502,31 @@ export async function activate(
                 const modePick = await vscode.window.showQuickPick(
                     [
                         {
-                            label: 'Copy',
-                            description: 'Most compatible mode',
+                            label: localize('Copy', '复制'),
+                            description: localize(
+                                'Most compatible mode',
+                                '兼容性最好的模式',
+                            ),
                             mode: 'copy' as SyncMode,
                         },
                         {
-                            label: 'Symlink',
-                            description: 'Directory symbolic link',
+                            label: localize('Symlink', '符号链接'),
+                            description: localize(
+                                'Directory symbolic link',
+                                '目录符号链接',
+                            ),
                             mode: 'symlink' as SyncMode,
                         },
                         {
-                            label: 'Junction',
-                            description: 'Windows directory junction',
+                            label: localize('Junction', '目录联接'),
+                            description: localize(
+                                'Windows directory junction',
+                                'Windows 目录联接',
+                            ),
                             mode: 'junction' as SyncMode,
                         },
                     ],
-                    { title: 'Select sync mode' },
+                    { title: localize('Select sync mode', '选择同步模式') },
                 );
 
                 if (!modePick) {
@@ -490,14 +552,20 @@ export async function activate(
                         synced += 1;
                     } catch (error) {
                         vscode.window.showWarningMessage(
-                            `Failed to sync ${skill.name} to ${agent.name}: ${String(error)}`,
+                            localize(
+                                `Failed to sync ${skill.name} to ${agent.name}: ${String(error)}`,
+                                `同步 ${skill.name} 到 ${agent.name} 失败：${String(error)}`,
+                            ),
                         );
                     }
                 }
 
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Synced ${skill.name} to ${synced} agent(s) using ${modePick.mode}.`,
+                    localize(
+                        `Synced ${skill.name} to ${synced} agent(s) using ${modePick.mode}.`,
+                        `已使用 ${modePick.mode} 将 ${skill.name} 同步到 ${synced} 个智能体。`,
+                    ),
                 );
             },
         ),
@@ -508,7 +576,10 @@ export async function activate(
                 mcpProvider.refresh(cachedMcp);
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Detected ${cachedMcp.length} MCP server(s) across tools.`,
+                    localize(
+                        `Detected ${cachedMcp.length} MCP server(s) across tools.`,
+                        `已在各工具中检测到 ${cachedMcp.length} 个 MCP 服务器。`,
+                    ),
                 );
             },
         ),
@@ -524,22 +595,35 @@ export async function activate(
                     const pick = await vscode.window.showQuickPick(
                         cachedMcp.map((s) => ({
                             label: `${s.toolName}: ${s.name}`,
-                            description: s.disabled ? 'Disabled' : 'Enabled',
+                            description: s.disabled
+                                ? t('disabled')
+                                : t('enabled'),
                             server: s,
                         })),
-                        { title: 'Select MCP server to toggle' },
+                        {
+                            title: localize(
+                                'Select MCP server to toggle',
+                                '选择要切换状态的 MCP 服务器',
+                            ),
+                        },
                     );
                     if (!pick) {
                         return;
                     }
                     const toggled = await mcpManager.toggleEnabled(pick.server);
                     vscode.window.showInformationMessage(
-                        `${pick.server.name} is now ${toggled ? 'enabled' : 'disabled'}.`,
+                        localize(
+                            `${pick.server.name} is now ${toggled ? 'enabled' : 'disabled'}.`,
+                            `${pick.server.name} 现在${toggled ? '已启用' : '已禁用'}。`,
+                        ),
                     );
                 } else {
                     const toggled = await mcpManager.toggleEnabled(server);
                     vscode.window.showInformationMessage(
-                        `${server.name} is now ${toggled ? 'enabled' : 'disabled'}.`,
+                        localize(
+                            `${server.name} is now ${toggled ? 'enabled' : 'disabled'}.`,
+                            `${server.name} 现在${toggled ? '已启用' : '已禁用'}。`,
+                        ),
                     );
                 }
                 cachedMcp = await mcpManager.detectAll();
@@ -562,7 +646,12 @@ export async function activate(
                             description: s.command,
                             server: s,
                         })),
-                        { title: 'Select MCP server to sync' },
+                        {
+                            title: localize(
+                                'Select MCP server to sync',
+                                '选择要同步的 MCP 服务器',
+                            ),
+                        },
                     );
                     if (!pick) {
                         return;
@@ -574,7 +663,12 @@ export async function activate(
                             description: t.configPath,
                             target: t,
                         })),
-                        { title: 'Select target tool config' },
+                        {
+                            title: localize(
+                                'Select target tool config',
+                                '选择目标工具配置',
+                            ),
+                        },
                     );
                     if (!targetPick) {
                         return;
@@ -584,7 +678,10 @@ export async function activate(
                         targetPick.target.configPath,
                     );
                     vscode.window.showInformationMessage(
-                        `Synced ${pick.server.name} to ${targetPick.target.toolName}.`,
+                        localize(
+                            `Synced ${pick.server.name} to ${targetPick.target.toolName}.`,
+                            `已将 ${pick.server.name} 同步到 ${targetPick.target.toolName}。`,
+                        ),
                     );
                 } else {
                     const allSources = buildMcpTargetList();
@@ -594,7 +691,12 @@ export async function activate(
                             description: t.configPath,
                             target: t,
                         })),
-                        { title: 'Select target tool config' },
+                        {
+                            title: localize(
+                                'Select target tool config',
+                                '选择目标工具配置',
+                            ),
+                        },
                     );
                     if (!targetPick) {
                         return;
@@ -604,7 +706,10 @@ export async function activate(
                         targetPick.target.configPath,
                     );
                     vscode.window.showInformationMessage(
-                        `Synced ${server.name} to ${targetPick.target.toolName}.`,
+                        localize(
+                            `Synced ${server.name} to ${targetPick.target.toolName}.`,
+                            `已将 ${server.name} 同步到 ${targetPick.target.toolName}。`,
+                        ),
                     );
                 }
                 await updateManagerPanel();
@@ -614,11 +719,14 @@ export async function activate(
             'agentSkillsManager.backupRepository',
             async () => {
                 const target = await vscode.window.showOpenDialog({
-                    title: 'Select backup destination folder',
+                    title: localize(
+                        'Select backup destination folder',
+                        '选择备份目标文件夹',
+                    ),
                     canSelectFiles: false,
                     canSelectFolders: true,
                     canSelectMany: false,
-                    openLabel: 'Backup Here',
+                    openLabel: localize('Backup Here', '备份到这里'),
                 });
 
                 if (!target?.[0]) {
@@ -628,7 +736,10 @@ export async function activate(
                 const backup = new BackupService(getCentralRepository());
                 const dest = await backup.backup(target[0].fsPath);
                 vscode.window.showInformationMessage(
-                    `Repository backed up to ${dest}.`,
+                    localize(
+                        `Repository backed up to ${dest}.`,
+                        `仓库已备份到 ${dest}。`,
+                    ),
                 );
             },
         ),
@@ -636,11 +747,14 @@ export async function activate(
             'agentSkillsManager.restoreRepository',
             async () => {
                 const source = await vscode.window.showOpenDialog({
-                    title: 'Select backup folder to restore from',
+                    title: localize(
+                        'Select backup folder to restore from',
+                        '选择要恢复的备份文件夹',
+                    ),
                     canSelectFiles: false,
                     canSelectFolders: true,
                     canSelectMany: false,
-                    openLabel: 'Restore From',
+                    openLabel: localize('Restore From', '从这里恢复'),
                 });
 
                 if (!source?.[0]) {
@@ -652,7 +766,10 @@ export async function activate(
                 await refreshAll();
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Restored ${restored.length} item(s): ${restored.join(', ') || '(none)'}.`,
+                    localize(
+                        `Restored ${restored.length} item(s): ${restored.join(', ') || '(none)'}.`,
+                        `已恢复 ${restored.length} 项：${restored.join(', ') || '（无）'}。`,
+                    ),
                 );
             },
         ),
@@ -662,7 +779,10 @@ export async function activate(
                 const skill = node?.payload as SkillInfo | undefined;
                 if (!skill) {
                     vscode.window.showWarningMessage(
-                        'Select a skill from the Skills tree to rename.',
+                        localize(
+                            'Select a skill from the Skills tree to rename.',
+                            '请从技能树中选择要重命名的技能。',
+                        ),
                     );
                     return;
                 }
@@ -680,12 +800,18 @@ export async function activate(
                 const currentName = headingMatch?.[1]?.trim() || skill.name;
 
                 const newName = await vscode.window.showInputBox({
-                    title: `Rename skill "${currentName}"`,
-                    prompt: 'Enter a new name for this skill.',
+                    title: localize(
+                        `Rename skill "${currentName}"`,
+                        `重命名技能“${currentName}”`,
+                    ),
+                    prompt: localize(
+                        'Enter a new name for this skill.',
+                        '请输入这个技能的新名称。',
+                    ),
                     value: currentName,
                     validateInput: (input) =>
                         input.trim().length === 0
-                            ? 'Name is required.'
+                            ? localize('Name is required.', '名称不能为空。')
                             : undefined,
                 });
 
@@ -701,7 +827,10 @@ export async function activate(
                 await refreshAll();
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Renamed skill to "${newName}".`,
+                    localize(
+                        `Renamed skill to "${newName}".`,
+                        `已将技能重命名为“${newName}”。`,
+                    ),
                 );
             },
         ),
@@ -711,7 +840,10 @@ export async function activate(
                 const skill = node?.payload as SkillInfo | undefined;
                 if (!skill) {
                     vscode.window.showWarningMessage(
-                        'Select a skill to edit its SKILL.md.',
+                        localize(
+                            'Select a skill to edit its SKILL.md.',
+                            '请选择要编辑 SKILL.md 的技能。',
+                        ),
                     );
                     return;
                 }
@@ -730,7 +862,7 @@ export async function activate(
                     : getConfiguredSources();
                 if (urls.length === 0) {
                     vscode.window.showInformationMessage(
-                        'No sources configured.',
+                        t('noSourcesConfiguredTable'),
                     );
                     return;
                 }
@@ -739,7 +871,10 @@ export async function activate(
                 const skills = await manager.discoverSkills(urls);
                 if (skills.length === 0) {
                     vscode.window.showInformationMessage(
-                        'No SKILL.md files found. Update the source first.',
+                        localize(
+                            'No SKILL.md files found. Update the source first.',
+                            '未找到 SKILL.md 文件。请先更新来源。',
+                        ),
                     );
                     return;
                 }
@@ -747,7 +882,10 @@ export async function activate(
                 const doc = await vscode.workspace.openTextDocument({
                     language: 'markdown',
                     content: [
-                        `# Source Skills (${urls.join(', ')})`,
+                        localize(
+                            `# Source Skills (${urls.join(', ')})`,
+                            `# 来源技能（${urls.join(', ')}）`,
+                        ),
                         '',
                         ...skills.map(
                             (s) =>
@@ -767,17 +905,20 @@ export async function activate(
                     : getConfiguredSources();
                 if (urls.length === 0) {
                     vscode.window.showInformationMessage(
-                        'No sources configured.',
+                        t('noSourcesConfiguredTable'),
                     );
                     return;
                 }
 
                 const choice = await vscode.window.showWarningMessage(
-                    `Install ALL skills from source(s)? This may overwrite existing skills.`,
+                    localize(
+                        'Install ALL skills from source(s)? This may overwrite existing skills.',
+                        '安装来源中的全部技能？这可能会覆盖现有技能。',
+                    ),
                     { modal: true },
-                    'Install All',
+                    localize('Install All', '全部安装'),
                 );
-                if (choice !== 'Install All') {
+                if (choice !== localize('Install All', '全部安装')) {
                     return;
                 }
 
@@ -791,7 +932,10 @@ export async function activate(
                 await refreshAll();
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Installed ${total} skill(s) from source(s).`,
+                    localize(
+                        `Installed ${total} skill(s) from source(s).`,
+                        `已从来源安装 ${total} 个技能。`,
+                    ),
                 );
             },
         ),
@@ -801,7 +945,10 @@ export async function activate(
                 const records = syncManager.getRecords();
                 if (records.length === 0) {
                     vscode.window.showInformationMessage(
-                        'No sync records to rollback.',
+                        localize(
+                            'No sync records to rollback.',
+                            '没有可回滚的同步记录。',
+                        ),
                     );
                     return;
                 }
@@ -813,7 +960,12 @@ export async function activate(
                         detail: r.syncedAt,
                         index: i,
                     })),
-                    { title: 'Select sync record to rollback' },
+                    {
+                        title: localize(
+                            'Select sync record to rollback',
+                            '选择要回滚的同步记录',
+                        ),
+                    },
                 );
 
                 if (pick === undefined) {
@@ -821,19 +973,25 @@ export async function activate(
                 }
 
                 const choice = await vscode.window.showWarningMessage(
-                    `Rollback sync of "${records[pick.index].skillName}"? This will remove ${records[pick.index].destinationPath}.`,
+                    localize(
+                        `Rollback sync of "${records[pick.index].skillName}"? This will remove ${records[pick.index].destinationPath}.`,
+                        `回滚“${records[pick.index].skillName}”的同步？这将移除 ${records[pick.index].destinationPath}。`,
+                    ),
                     { modal: true },
-                    'Rollback',
+                    localize('Rollback', '回滚'),
                 );
 
-                if (choice !== 'Rollback') {
+                if (choice !== localize('Rollback', '回滚')) {
                     return;
                 }
 
                 const rolled = await syncManager.rollbackRecord(pick.index);
                 await updateManagerPanel();
                 vscode.window.showInformationMessage(
-                    `Rolled back ${rolled?.skillName ?? ''}.`,
+                    localize(
+                        `Rolled back ${rolled?.skillName ?? ''}.`,
+                        `已回滚 ${rolled?.skillName ?? ''}。`,
+                    ),
                 );
             },
         ),
@@ -848,7 +1006,10 @@ export async function activate(
                 await vscode.window.withProgress(
                     {
                         location: vscode.ProgressLocation.Notification,
-                        title: 'Checking MCP server health',
+                        title: localize(
+                            'Checking MCP server health',
+                            '正在检查 MCP 服务器健康状态',
+                        ),
                         cancellable: false,
                     },
                     async () => {
@@ -861,7 +1022,10 @@ export async function activate(
 
                 const healthy = cachedMcp.filter((s) => s.healthy).length;
                 vscode.window.showInformationMessage(
-                    `${healthy}/${cachedMcp.length} MCP server(s) healthy.`,
+                    localize(
+                        `${healthy}/${cachedMcp.length} MCP server(s) healthy.`,
+                        `${healthy}/${cachedMcp.length} 个 MCP 服务器健康。`,
+                    ),
                 );
             },
         ),
@@ -871,13 +1035,16 @@ export async function activate(
                 const sources = getConfiguredSources();
                 if (sources.length === 0) {
                     vscode.window.showInformationMessage(
-                        'No sources configured.',
+                        t('noSourcesConfiguredTable'),
                     );
                     return;
                 }
 
                 const manager = getSourceManager();
-                const lines: string[] = ['# Source Update Status', ''];
+                const lines: string[] = [
+                    localize('# Source Update Status', '# 来源更新状态'),
+                    '',
+                ];
 
                 for (const url of sources) {
                     const status = await manager.checkForUpdates(url);
@@ -897,8 +1064,13 @@ export async function activate(
             'agentSkillsManager.exportConfig',
             async () => {
                 const target = await vscode.window.showSaveDialog({
-                    title: 'Export ASmanager Config',
-                    filters: { 'JSON Files': ['json'] },
+                    title: localize(
+                        'Export ASmanager Config',
+                        '导出 ASmanager 配置',
+                    ),
+                    filters: {
+                        [localize('JSON Files', 'JSON 文件')]: ['json'],
+                    },
                     defaultUri: vscode.Uri.file('asmanager-config.json'),
                 });
 
@@ -921,7 +1093,10 @@ export async function activate(
                 const content = JSON.stringify(data, null, 2);
                 await fs.writeFile(target.fsPath, content, 'utf8');
                 vscode.window.showInformationMessage(
-                    'Config exported successfully.',
+                    localize(
+                        'Config exported successfully.',
+                        '配置已成功导出。',
+                    ),
                 );
             },
         ),
@@ -929,11 +1104,16 @@ export async function activate(
             'agentSkillsManager.importConfig',
             async () => {
                 const source = await vscode.window.showOpenDialog({
-                    title: 'Import ASmanager Config',
+                    title: localize(
+                        'Import ASmanager Config',
+                        '导入 ASmanager 配置',
+                    ),
                     canSelectFiles: true,
                     canSelectFolders: false,
                     canSelectMany: false,
-                    filters: { 'JSON Files': ['json'] },
+                    filters: {
+                        [localize('JSON Files', 'JSON 文件')]: ['json'],
+                    },
                 });
 
                 if (!source?.[0]) {
@@ -964,7 +1144,10 @@ export async function activate(
 
                 await refreshAll();
                 vscode.window.showInformationMessage(
-                    'Config imported and applied.',
+                    localize(
+                        'Config imported and applied.',
+                        '配置已导入并应用。',
+                    ),
                 );
             },
         ),
@@ -972,12 +1155,18 @@ export async function activate(
             'agentSkillsManager.addSource',
             async () => {
                 const value = await vscode.window.showInputBox({
-                    title: 'Add Skill Source',
-                    prompt: 'Enter a GitHub repository URL or remote skill source URL.',
+                    title: localize('Add Skill Source', '添加技能来源'),
+                    prompt: localize(
+                        'Enter a GitHub repository URL or remote skill source URL.',
+                        '请输入 GitHub 仓库 URL 或远程技能来源 URL。',
+                    ),
                     placeHolder: 'https://github.com/example/skills',
                     validateInput: (input) =>
                         input.trim().length === 0
-                            ? 'Source URL is required.'
+                            ? localize(
+                                  'Source URL is required.',
+                                  '来源 URL 不能为空。',
+                              )
                             : undefined,
                 });
 
@@ -1006,7 +1195,10 @@ export async function activate(
                 const sources = getConfiguredSources();
                 if (sources.length === 0) {
                     vscode.window.showInformationMessage(
-                        'No skill sources configured.',
+                        localize(
+                            'No skill sources configured.',
+                            '未配置技能来源。',
+                        ),
                     );
                     return;
                 }
@@ -1014,7 +1206,10 @@ export async function activate(
                 await vscode.window.withProgress(
                     {
                         location: vscode.ProgressLocation.Notification,
-                        title: 'Updating skill sources',
+                        title: localize(
+                            'Updating skill sources',
+                            '正在更新技能来源',
+                        ),
                         cancellable: false,
                     },
                     async () => {
@@ -1024,7 +1219,10 @@ export async function activate(
 
                 await refreshAll();
                 vscode.window.showInformationMessage(
-                    `Updated ${sources.length} skill source(s).`,
+                    localize(
+                        `Updated ${sources.length} skill source(s).`,
+                        `已更新 ${sources.length} 个技能来源。`,
+                    ),
                 );
             },
         ),
@@ -1039,7 +1237,10 @@ export async function activate(
 
                 if (sourceUrls.length === 0) {
                     vscode.window.showInformationMessage(
-                        'No skill sources configured.',
+                        localize(
+                            'No skill sources configured.',
+                            '未配置技能来源。',
+                        ),
                     );
                     return;
                 }
@@ -1047,7 +1248,10 @@ export async function activate(
                 await vscode.window.withProgress(
                     {
                         location: vscode.ProgressLocation.Notification,
-                        title: 'Updating skill sources',
+                        title: localize(
+                            'Updating skill sources',
+                            '正在更新技能来源',
+                        ),
                         cancellable: false,
                     },
                     async () => {
@@ -1058,7 +1262,10 @@ export async function activate(
                 const sourceSkills = await manager.discoverSkills(sourceUrls);
                 if (sourceSkills.length === 0) {
                     vscode.window.showWarningMessage(
-                        'No SKILL.md files found in selected source(s).',
+                        localize(
+                            'No SKILL.md files found in selected source(s).',
+                            '所选来源中未找到 SKILL.md 文件。',
+                        ),
                     );
                     return;
                 }
@@ -1070,7 +1277,12 @@ export async function activate(
                         detail: skill.sourceUrl,
                         skill,
                     })),
-                    { title: 'Install Skill From Source' },
+                    {
+                        title: localize(
+                            'Install Skill From Source',
+                            '从来源安装技能',
+                        ),
+                    },
                 );
 
                 if (!selected) {
@@ -1080,7 +1292,10 @@ export async function activate(
                 const destination = await manager.installSkill(selected.skill);
                 await refreshAll();
                 vscode.window.showInformationMessage(
-                    `Installed ${selected.skill.name} to ${destination}.`,
+                    localize(
+                        `Installed ${selected.skill.name} to ${destination}.`,
+                        `已将 ${selected.skill.name} 安装到 ${destination}。`,
+                    ),
                 );
             },
         ),
@@ -1106,7 +1321,10 @@ export async function activate(
                 const document = await vscode.workspace.openTextDocument({
                     language: 'markdown',
                     content: [
-                        '# Agent Skills Diagnostics',
+                        localize(
+                            '# Agent Skills Diagnostics',
+                            '# 智能体技能诊断',
+                        ),
                         '',
                         ...issues.map(
                             (issue) =>
@@ -1133,7 +1351,12 @@ export async function activate(
                             description: item.description,
                             skill: item,
                         })),
-                        { title: 'Select a skill to sync' },
+                        {
+                            title: localize(
+                                'Select a skill to sync',
+                                '选择要同步的技能',
+                            ),
+                        },
                     );
                     skill = selected?.skill;
                 }
@@ -1143,11 +1366,14 @@ export async function activate(
                 }
 
                 const target = await vscode.window.showOpenDialog({
-                    title: `Select destination folder for ${skill.name}`,
+                    title: localize(
+                        `Select destination folder for ${skill.name}`,
+                        `选择 ${skill.name} 的目标文件夹`,
+                    ),
                     canSelectFiles: false,
                     canSelectFolders: true,
                     canSelectMany: false,
-                    openLabel: 'Sync Here',
+                    openLabel: localize('Sync Here', '同步到这里'),
                 });
 
                 const destinationRoot = target?.[0]?.fsPath;
@@ -1158,22 +1384,31 @@ export async function activate(
                 const modePick = await vscode.window.showQuickPick(
                     [
                         {
-                            label: 'Copy',
-                            description: 'Most compatible mode',
+                            label: localize('Copy', '复制'),
+                            description: localize(
+                                'Most compatible mode',
+                                '兼容性最好的模式',
+                            ),
                             mode: 'copy' as SyncMode,
                         },
                         {
-                            label: 'Symlink',
-                            description: 'Directory symbolic link',
+                            label: localize('Symlink', '符号链接'),
+                            description: localize(
+                                'Directory symbolic link',
+                                '目录符号链接',
+                            ),
                             mode: 'symlink' as SyncMode,
                         },
                         {
-                            label: 'Junction',
-                            description: 'Windows directory junction',
+                            label: localize('Junction', '目录联接'),
+                            description: localize(
+                                'Windows directory junction',
+                                'Windows 目录联接',
+                            ),
                             mode: 'junction' as SyncMode,
                         },
                     ],
-                    { title: 'Select sync mode' },
+                    { title: localize('Select sync mode', '选择同步模式') },
                 );
 
                 if (!modePick) {
@@ -1186,7 +1421,10 @@ export async function activate(
                     modePick.mode,
                 );
                 vscode.window.showInformationMessage(
-                    `Synced ${skill.name} to ${path.normalize(destination)} using ${modePick.mode}.`,
+                    localize(
+                        `Synced ${skill.name} to ${path.normalize(destination)} using ${modePick.mode}.`,
+                        `已使用 ${modePick.mode} 将 ${skill.name} 同步到 ${path.normalize(destination)}。`,
+                    ),
                 );
             },
         ),
@@ -1195,10 +1433,13 @@ export async function activate(
             async () => {
                 const records = syncManager.getRecords();
                 const content = [
-                    '# Agent Skills Sync Records',
+                    localize(
+                        '# Agent Skills Sync Records',
+                        '# 智能体技能同步记录',
+                    ),
                     '',
                     records.length === 0
-                        ? 'No sync records yet.'
+                        ? t('noSyncRecordsYet')
                         : records
                               .map(
                                   (record) =>
@@ -1218,17 +1459,22 @@ export async function activate(
             'agentSkillsManager.clearSyncRecords',
             async () => {
                 const choice = await vscode.window.showWarningMessage(
-                    'Clear all Agent Skills sync records?',
+                    localize(
+                        'Clear all Agent Skills sync records?',
+                        '清除全部智能体技能同步记录？',
+                    ),
                     { modal: true },
-                    'Clear',
+                    localize('Clear', '清除'),
                 );
 
-                if (choice !== 'Clear') {
+                if (choice !== localize('Clear', '清除')) {
                     return;
                 }
 
                 await syncManager.clearRecords();
-                vscode.window.showInformationMessage('Sync records cleared.');
+                vscode.window.showInformationMessage(
+                    localize('Sync records cleared.', '同步记录已清除。'),
+                );
             },
         ),
     );

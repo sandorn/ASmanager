@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { AgentInfo } from '../types/models';
+import { localize, t } from './localization';
 
 async function exists(targetPath: string): Promise<boolean> {
     try {
@@ -109,8 +110,11 @@ export class AgentDetector {
                 ...candidate,
                 detected: Boolean(existingPath),
                 detail: existingPath
-                    ? `Detected at ${existingPath}`
-                    : 'Not detected',
+                    ? localize(
+                          `Detected at ${existingPath}`,
+                          `检测位置：${existingPath}`,
+                      )
+                    : t('notDetected'),
             });
         }
 

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { McpServerInfo } from '../types/models';
+import { t } from '../services/localization';
 import { SimpleTreeNode } from './treeNode';
 
 export class McpTreeProvider implements vscode.TreeDataProvider<SimpleTreeNode> {
@@ -20,8 +21,8 @@ export class McpTreeProvider implements vscode.TreeDataProvider<SimpleTreeNode> 
         if (this.servers.length === 0) {
             return [
                 new SimpleTreeNode('message', {
-                    label: 'No MCP servers detected',
-                    description: 'Run Detect MCP Servers',
+                    label: t('noMcpServersDetected'),
+                    description: t('runDetectMcpServers'),
                     icon: new vscode.ThemeIcon('server'),
                 }),
             ];
@@ -31,8 +32,8 @@ export class McpTreeProvider implements vscode.TreeDataProvider<SimpleTreeNode> 
             (server) =>
                 new SimpleTreeNode('agent', {
                     label: server.name,
-                    description: server.disabled ? 'Disabled' : 'Enabled',
-                    tooltip: `Tool: ${server.toolName}\nCommand: ${server.command} ${server.args.join(' ')}\nSource: ${server.sourcePath}`,
+                    description: server.disabled ? t('disabled') : t('enabled'),
+                    tooltip: `${t('tool')}: ${server.toolName}\n${t('command')}: ${server.command} ${server.args.join(' ')}\n${t('source')}: ${server.sourcePath}`,
                     icon: new vscode.ThemeIcon(
                         server.disabled ? 'circle-slash' : 'pass',
                     ),
