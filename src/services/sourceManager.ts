@@ -1,0 +1,183 @@
+import { execFile } from 'node:child_process';
+import * as crypto from 'node:crypto';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { promisify } from 'node:util';
+import { SourceInfo, SourceSkillInfo } from '../types/models';
+import {
+    copyDirectory,
+    ensureDirectory,
+    fileExists,
+    findFilesByName,
+    removePath,
+} from './fileSystem';
+
+const execFileAsync = promisify(execFile);
+
+function sourceFolderName(url: string): string {
+    const readable = url
+        .replace(/^https?:\/\//, '')
+        .replace(/\.git$/, '')
+        .replace(/[^a-zA-Z0-9_.-]+/g, '-');
+    const hash = crypto
+        .createHash('sha1')
+        .update(url)
+        .digest('hex')
+        .slice(0, 8);
+    return `${readable}-${hash}`;
+}
+
+function parseDescription(markdown: string): string {
+    const descriptionMatch = markdown.match(
+        /^description:\s*["']?(.+?)["']?\s*$/im,
+    );
+    if (descriptionMatch?.[1]) {
+        return descriptionMatch[1].trim();
+    }
+
+    const paragraph = markdown
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .find((line) => line && !line.startsWith('#') && !line.includes(':'));
+
+    return paragraph || 'No description found.';
+}
+
+export class SourceManager {
+    private readonly sourcesRoot: string;
+
+    constructor(private readonly repositoryPath: string) {
+        this.sourcesRoot = path.join(repositoryPath, '.sources');
+    }
+
+    async list(urls: string[]): Promise<SourceInfo[]> {
+        await ensureDirectory(this.sourcesRoot);
+        const sources: SourceInfo[] = [];
+
+        for (const url of urls) {
+            const localPath = this.getLocalPath(url);
+            const installed = await fileExists(localPath);
+            sources.push({
+                url,
+                configured: true,
+                localPath,
+                installed,
+                detail: installed
+                    ? `Cached at ${localPath}`
+                    : 'Not fetched yet',
+            });
+        }
+
+        return sources;
+    }
+
+    async update(url: string): Promise<string> {
+        await ensureDirectory(this.sourcesRoot);
+        const localPath = this.getLocalPath(url);
+
+        if (await fileExists(path.join(localPath, '.git'))) {
+            await execFileAsync('git', ['-C', localPath, 'pull', '--ff-only']);
+            return localPath;
+        }
+
+        await execFileAsync('git', ['clone', '--depth', '1', url, localPath]);
+        return localPath;
+    }
+
+    async checkForUpdates(url: string): Promise<{
+        behind: boolean;
+        detail: string;
+    }> {
+        const localPath = this.getLocalPath(url);
+        if (!(await fileExists(path.join(localPath, '.git')))) {
+            return { behind: false, detail: 'Not cloned yet' };
+        }
+
+        try {
+            await execFileAsync('git', [
+                '-C',
+                localPath,
+                'fetch',
+                '--depth',
+                '1',
+                'origin',
+            ]);
+            const { stdout } = await execFileAsync('git', [
+                '-C',
+                localPath,
+                'rev-list',
+                '--count',
+                'HEAD..origin/HEAD',
+            ]);
+            const behind = parseInt(stdout.trim(), 10) || 0;
+            return {
+                behind: behind > 0,
+                detail:
+                    behind > 0 ? `${behind} commit(s) behind` : 'Up to date',
+            };
+        } catch {
+            return { behind: false, detail: 'Could not check' };
+        }
+    }
+
+    async updateAll(urls: string[]): Promise<string[]> {
+        const updated: string[] = [];
+        for (const url of urls) {
+            updated.push(await this.update(url));
+        }
+        return updated;
+    }
+
+    async discoverSkills(urls: string[]): Promise<SourceSkillInfo[]> {
+        const skills: SourceSkillInfo[] = [];
+        for (const url of urls) {
+            const localPath = this.getLocalPath(url);
+            const skillFiles = await findFilesByName(localPath, 'SKILL.md');
+
+            for (const skillFile of skillFiles) {
+                const skillPath = path.dirname(skillFile);
+                const markdown = await fs.readFile(skillFile, 'utf8');
+                const heading = markdown.match(/^#\s+(.+)$/m)?.[1]?.trim();
+                skills.push({
+                    name: heading || path.basename(skillPath),
+                    description: parseDescription(markdown),
+                    path: skillPath,
+                    sourceUrl: url,
+                });
+            }
+        }
+
+        return skills.sort((left, right) =>
+            left.name.localeCompare(right.name),
+        );
+    }
+
+    async installAllFromSource(url: string): Promise<string[]> {
+        const skills = await this.discoverSkills([url]);
+        const installed: string[] = [];
+        for (const skill of skills) {
+            const dest = await this.installSkill(skill);
+            installed.push(dest);
+        }
+        return installed;
+    }
+
+    async installSkill(skill: SourceSkillInfo): Promise<string> {
+        await ensureDirectory(this.repositoryPath);
+        const destination = path.join(
+            this.repositoryPath,
+            path.basename(skill.path),
+        );
+        await copyDirectory(skill.path, destination);
+        return destination;
+    }
+
+    async removeSourceCache(url: string): Promise<void> {
+        const localPath = this.getLocalPath(url);
+        await removePath(localPath);
+    }
+
+    private getLocalPath(url: string): string {
+        return path.join(this.sourcesRoot, sourceFolderName(url));
+    }
+}

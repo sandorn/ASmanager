@@ -1,0 +1,289 @@
+{
+    "name": "asmanager",
+    "displayName": "ASmanager",
+    "description": "Manage local AI Agent skills and MCP assets from a central repository.",
+    "version": "0.0.1",
+    "publisher": "Sandhill",
+    "license": "SEE LICENSE IN LICENSE",
+    "engines": {
+        "vscode": "^1.95.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "configuration": {
+            "title": "ASmanager",
+            "properties": {
+                "agentSkillsManager.centralRepository": {
+                    "type": "string",
+                    "default": "~/.agents/skills",
+                    "description": "Central repository path for AI Agent skills."
+                },
+                "agentSkillsManager.sources": {
+                    "type": "array",
+                    "default": [
+                        "https://github.com/anthropics/skills",
+                        "https://github.com/openai/skills",
+                        "https://github.com/MoizIbnYousaf/Ai-Agent-Skills",
+                        "https://github.com/heilcheng/awesome-agent-skills"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "GitHub or remote skill source URLs."
+                }
+            }
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "agentSkillsManager",
+                    "title": "Agent Skills",
+                    "icon": "$(tools)"
+                }
+            ]
+        },
+        "views": {
+            "agentSkillsManager": [
+                {
+                    "id": "agentSkillsManager.skills",
+                    "name": "Skills"
+                },
+                {
+                    "id": "agentSkillsManager.agents",
+                    "name": "Agents"
+                },
+                {
+                    "id": "agentSkillsManager.sources",
+                    "name": "Sources"
+                },
+                {
+                    "id": "agentSkillsManager.mcp",
+                    "name": "MCP Servers"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "agentSkillsManager.initializeRepository",
+                "title": "ASmanager: Initialize Repository",
+                "icon": "$(repo-create)"
+            },
+            {
+                "command": "agentSkillsManager.refresh",
+                "title": "ASmanager: Refresh",
+                "icon": "$(refresh)"
+            },
+            {
+                "command": "agentSkillsManager.openRepository",
+                "title": "ASmanager: Open Repository",
+                "icon": "$(folder-opened)"
+            },
+            {
+                "command": "agentSkillsManager.openManager",
+                "title": "ASmanager: Open Manager",
+                "icon": "$(dashboard)"
+            },
+            {
+                "command": "agentSkillsManager.addSource",
+                "title": "ASmanager: Add Source",
+                "icon": "$(add)"
+            },
+            {
+                "command": "agentSkillsManager.updateSources",
+                "title": "ASmanager: Update Sources",
+                "icon": "$(cloud-download)"
+            },
+            {
+                "command": "agentSkillsManager.installSkillFromSource",
+                "title": "ASmanager: Install Skill From Source",
+                "icon": "$(cloud-download)"
+            },
+            {
+                "command": "agentSkillsManager.detectAgents",
+                "title": "ASmanager: Detect Agents",
+                "icon": "$(search)"
+            },
+            {
+                "command": "agentSkillsManager.diagnoseSkills",
+                "title": "ASmanager: Diagnose Skills",
+                "icon": "$(pulse)"
+            },
+            {
+                "command": "agentSkillsManager.syncSkill",
+                "title": "ASmanager: Sync Skill",
+                "icon": "$(sync)"
+            },
+            {
+                "command": "agentSkillsManager.syncSkillToAgents",
+                "title": "ASmanager: Sync Skill to Agents",
+                "icon": "$(sync-ignored)"
+            },
+            {
+                "command": "agentSkillsManager.deleteSkill",
+                "title": "ASmanager: Delete Skill",
+                "icon": "$(trash)"
+            },
+            {
+                "command": "agentSkillsManager.removeSource",
+                "title": "ASmanager: Remove Source",
+                "icon": "$(trash)"
+            },
+            {
+                "command": "agentSkillsManager.showSyncRecords",
+                "title": "Agent Skills: Show Sync Records",
+                "icon": "$(history)"
+            },
+            {
+                "command": "agentSkillsManager.clearSyncRecords",
+                "title": "Agent Skills: Clear Sync Records",
+                "icon": "$(clear-all)"
+            },
+            {
+                "command": "agentSkillsManager.detectMcp",
+                "title": "ASmanager: Detect MCP Servers",
+                "icon": "$(server)"
+            },
+            {
+                "command": "agentSkillsManager.toggleMcpServer",
+                "title": "ASmanager: Toggle MCP Server",
+                "icon": "$(debug-start)"
+            },
+            {
+                "command": "agentSkillsManager.syncMcpServer",
+                "title": "ASmanager: Sync MCP Server",
+                "icon": "$(sync)"
+            },
+            {
+                "command": "agentSkillsManager.backupRepository",
+                "title": "ASmanager: Backup Repository",
+                "icon": "$(export)"
+            },
+            {
+                "command": "agentSkillsManager.restoreRepository",
+                "title": "ASmanager: Restore Repository",
+                "icon": "$(folder-opened)"
+            },
+            {
+                "command": "agentSkillsManager.renameSkill",
+                "title": "ASmanager: Rename Skill",
+                "icon": "$(edit)"
+            },
+            {
+                "command": "agentSkillsManager.editSkillMarkdown",
+                "title": "ASmanager: Edit Skill Markdown",
+                "icon": "$(edit)"
+            },
+            {
+                "command": "agentSkillsManager.showSourceSkills",
+                "title": "ASmanager: Show Source Skills",
+                "icon": "$(list-tree)"
+            },
+            {
+                "command": "agentSkillsManager.installAllFromSource",
+                "title": "ASmanager: Install All From Source",
+                "icon": "$(cloud-download)"
+            },
+            {
+                "command": "agentSkillsManager.rollbackSync",
+                "title": "ASmanager: Rollback Sync",
+                "icon": "$(debug-reverse-continue)"
+            },
+            {
+                "command": "agentSkillsManager.healthCheckMcp",
+                "title": "ASmanager: Health Check MCP Servers",
+                "icon": "$(pulse)"
+            },
+            {
+                "command": "agentSkillsManager.checkSourceUpdates",
+                "title": "ASmanager: Check Source Updates",
+                "icon": "$(sync)"
+            },
+            {
+                "command": "agentSkillsManager.exportConfig",
+                "title": "ASmanager: Export Config",
+                "icon": "$(export)"
+            },
+            {
+                "command": "agentSkillsManager.importConfig",
+                "title": "ASmanager: Import Config",
+                "icon": "$(folder-opened)"
+            }
+        ],
+        "menus": {
+            "view/title": [
+                {
+                    "command": "agentSkillsManager.refresh",
+                    "when": "view == agentSkillsManager.skills || view == agentSkillsManager.agents || view == agentSkillsManager.sources",
+                    "group": "navigation"
+                },
+                {
+                    "command": "agentSkillsManager.openManager",
+                    "when": "view == agentSkillsManager.skills || view == agentSkillsManager.agents || view == agentSkillsManager.sources",
+                    "group": "navigation"
+                },
+                {
+                    "command": "agentSkillsManager.detectMcp",
+                    "when": "view == agentSkillsManager.skills || view == agentSkillsManager.agents || view == agentSkillsManager.sources",
+                    "group": "navigation"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "agentSkillsManager.syncSkill",
+                    "when": "view == agentSkillsManager.skills && viewItem == skill",
+                    "group": "inline"
+                },
+                {
+                    "command": "agentSkillsManager.deleteSkill",
+                    "when": "view == agentSkillsManager.skills && viewItem == skill",
+                    "group": "inline@2"
+                },
+                {
+                    "command": "agentSkillsManager.renameSkill",
+                    "when": "view == agentSkillsManager.skills && viewItem == skill",
+                    "group": "context@1"
+                },
+                {
+                    "command": "agentSkillsManager.editSkillMarkdown",
+                    "when": "view == agentSkillsManager.skills && viewItem == skill",
+                    "group": "context@2"
+                },
+                {
+                    "command": "agentSkillsManager.installSkillFromSource",
+                    "when": "view == agentSkillsManager.sources && viewItem == source",
+                    "group": "inline"
+                },
+                {
+                    "command": "agentSkillsManager.removeSource",
+                    "when": "view == agentSkillsManager.sources && viewItem == source",
+                    "group": "inline@2"
+                },
+                {
+                    "command": "agentSkillsManager.showSourceSkills",
+                    "when": "view == agentSkillsManager.sources && viewItem == source",
+                    "group": "context@1"
+                },
+                {
+                    "command": "agentSkillsManager.installAllFromSource",
+                    "when": "view == agentSkillsManager.sources && viewItem == source",
+                    "group": "context@2"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "package": "vsce package --allow-missing-repository"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.1",
+        "@types/vscode": "^1.95.0",
+        "@vscode/vsce": "^3.2.1",
+        "typescript": "^5.7.2"
+    }
+}
