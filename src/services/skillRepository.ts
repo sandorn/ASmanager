@@ -114,7 +114,6 @@ export class SkillRepository {
                     issues: [localize('Missing SKILL.md.', '缺少 SKILL.md。')],
                     tags: [],
                     category: '',
-                    score: 0,
                 });
                 continue;
             }
@@ -134,26 +133,6 @@ export class SkillRepository {
             }
 
             const status = issues.length > 0 ? 'warning' : 'ready';
-            const hasName = !issues.includes(
-                localize(
-                    'Missing explicit skill name.',
-                    '缺少明确的技能名称。',
-                ),
-            );
-            const hasDesc = !issues.includes(
-                localize('Missing description.', '缺少描述。'),
-            );
-            const score =
-                Math.round(
-                    ((hasName ? 30 : 0) +
-                        (hasDesc ? 20 : 0) +
-                        (parsed.tags.length > 0 ? 15 : 0) +
-                        (parsed.category ? 10 : 0) +
-                        (stats.fileCount > 1 ? 10 : 0) +
-                        (stats.fileCount >= 3 ? 10 : 0) +
-                        (stats.sizeBytes < 10 * 1024 * 1024 ? 5 : 0)) *
-                        10,
-                ) / 10;
 
             skills.push({
                 name: parsed.name,
@@ -167,7 +146,6 @@ export class SkillRepository {
                 issues,
                 tags: parsed.tags,
                 category: parsed.category,
-                score,
             });
         }
 

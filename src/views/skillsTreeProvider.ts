@@ -40,7 +40,7 @@ export class SkillsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
                           : new vscode.ThemeIcon('warning');
 
                 return new SimpleTreeNode('skill', {
-                    label: `${skill.name}  [${skill.score}/10]`,
+                    label: skill.name,
                     description: `${skill.fileCount} ${t('files')}, ${formatBytes(skill.sizeBytes)}`,
                     tooltip: `${skill.description}\n${skill.path}`,
                     icon,
@@ -65,7 +65,7 @@ export class SkillsTreeProvider implements vscode.TreeDataProvider<SimpleTreeNod
                 icon: new vscode.ThemeIcon('folder'),
             }),
             new SimpleTreeNode('message', {
-                label: `${t('score')}: ${skill.score}/10 | ${t('files')}: ${skill.fileCount} | ${t('size')}: ${formatBytes(skill.sizeBytes)}`,
+                label: `${t('files')}: ${skill.fileCount} | ${t('size')}: ${formatBytes(skill.sizeBytes)}`,
                 icon: new vscode.ThemeIcon('file'),
             }),
             new SimpleTreeNode('message', {

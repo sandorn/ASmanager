@@ -62,8 +62,18 @@ export async function readJsonFile<T>(
         return fallback;
     }
 
-    const content = await fs.readFile(targetPath, 'utf8');
-    return JSON.parse(content) as T;
+    const raw = await fs.readFile(targetPath, 'utf8');
+    try {
+        return JSON.parse(raw) as T;
+    } catch {
+        // Try JSONC — strip single-line comments and trailing commas
+        const cleaned = raw
+            .split(/\r?\n/)
+            .map((line) => line.replace(/\/\/.*$/, '').trim())
+            .join('\n')
+            .replace(/,(\s*[}\]])/g, '$1');
+        return JSON.parse(cleaned) as T;
+    }
 }
 
 export async function writeJsonFile(

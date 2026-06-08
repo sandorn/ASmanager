@@ -3,6 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
+import * as vscode from 'vscode';
 import { McpServerInfo } from '../types/models';
 import { fileExists, readJsonFile, writeJsonFile } from './fileSystem';
 import { localize, t } from './localization';
@@ -13,12 +14,15 @@ interface McpConfigDocument {
     mcpServers?: Record<
         string,
         {
+            type?: string;
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             disabled?: boolean;
+            url?: string;
         }
     >;
+    servers?: McpConfigDocument['mcpServers'];
 }
 
 interface ToolMcpSource {
@@ -31,6 +35,9 @@ function buildToolSources(): ToolMcpSource[] {
     const home = os.homedir();
     const appData =
         process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
+    const workspaceMcpPaths = (vscode.workspace.workspaceFolders ?? []).map(
+        (folder) => path.join(folder.uri.fsPath, '.vscode', 'mcp.json'),
+    );
 
     return [
         {
@@ -54,10 +61,11 @@ function buildToolSources(): ToolMcpSource[] {
         },
         {
             toolId: 'copilot',
-            toolName: 'Copilot',
+            toolName: 'VS Code / Copilot',
             configPaths: [
                 path.join(appData, 'Code', 'User', 'mcp.json'),
-                path.join('.vscode', 'mcp.json'),
+                path.join(home, '.vscode', 'mcp.json'),
+                ...workspaceMcpPaths,
             ],
         },
         {
@@ -105,10 +113,12 @@ function normalizeServers(
     raw: Record<
         string,
         {
+            type?: string;
             command?: string;
             args?: string[];
             env?: Record<string, string>;
             disabled?: boolean;
+            url?: string;
         }
     >,
     sourcePath: string,
@@ -117,7 +127,7 @@ function normalizeServers(
 ): McpServerInfo[] {
     return Object.entries(raw).map(([name, entry]) => ({
         name,
-        command: entry.command || '',
+        command: entry.command || entry.url || entry.type || '',
         args: Array.isArray(entry.args) ? entry.args : [],
         env: entry.env || {},
         disabled: Boolean(entry.disabled),
@@ -127,6 +137,15 @@ function normalizeServers(
         healthy: false,
         healthDetail: t('notChecked'),
     }));
+}
+
+function getServerRecords(
+    doc: McpConfigDocument,
+): Array<NonNullable<McpConfigDocument['mcpServers']>> {
+    return [doc.mcpServers, doc.servers].filter(
+        (servers): servers is NonNullable<McpConfigDocument['mcpServers']> =>
+            Boolean(servers) && typeof servers === 'object',
+    );
 }
 
 export class McpManager {
@@ -144,21 +163,32 @@ export class McpManager {
                     configPath,
                     {},
                 );
-                if (doc.mcpServers && typeof doc.mcpServers === 'object') {
+
+                const serverRecords = getServerRecords(doc);
+                for (const serverRecord of serverRecords) {
                     servers.push(
                         ...normalizeServers(
-                            doc.mcpServers,
+                            serverRecord,
                             configPath,
                             source.toolId,
                             source.toolName,
                         ),
                     );
-                    break; // first found config wins for this tool
                 }
             }
         }
 
-        return servers.sort((left, right) =>
+        const uniqueServers = servers.filter(
+            (server, index, list) =>
+                list.findIndex(
+                    (candidate) =>
+                        candidate.name === server.name &&
+                        candidate.sourcePath === server.sourcePath &&
+                        candidate.toolId === server.toolId,
+                ) === index,
+        );
+
+        return uniqueServers.sort((left, right) =>
             `${left.toolId}:${left.name}`.localeCompare(
                 `${right.toolId}:${right.name}`,
             ),

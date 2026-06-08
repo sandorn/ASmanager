@@ -12,7 +12,6 @@ export interface SkillInfo {
     issues: string[];
     tags: string[];
     category: string;
-    score: number;
 }
 
 export interface AgentInfo {

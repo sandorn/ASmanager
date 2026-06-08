@@ -33,20 +33,22 @@ function statusClass(value: string): string {
 
 function renderSkillRows(skills: SkillInfo[]): string {
     if (skills.length === 0) {
-        return `<tr><td colspan="7" class="empty">${t('noSkillsFoundTable')}</td></tr>`;
+        return `<tr><td colspan="6" class="empty">${t('noSkillsFoundTable')}</td></tr>`;
     }
 
     return skills
         .map(
             (skill) => `
-                <tr>
-                    <td><strong>${escapeHtml(skill.name)}</strong><span>${escapeHtml(skill.description)}${skill.category ? ` [${escapeHtml(skill.category)}]` : ''}${skill.tags.length > 0 ? ` ${t('tags')}: ${escapeHtml(skill.tags.join(', '))}` : ''}</span></td>
+                <tr class="skill-main-row">
+                    <td><strong>${escapeHtml(skill.name)}</strong></td>
                     <td><span class="badge ${statusClass(skill.status)}">${escapeHtml(skill.status)}</span></td>
-                    <td><span class="badge muted">${skill.score}/10</span></td>
                     <td>${skill.fileCount}</td>
                     <td>${formatBytes(skill.sizeBytes)}</td>
                     <td title="${escapeHtml(skill.path)}">${escapeHtml(skill.path)}</td>
                     <td><button data-command="deleteSkill" data-payload="${escapeHtml(JSON.stringify({ path: skill.path, name: skill.name }))}" class="secondary small">${t('delete')}</button></td>
+                </tr>
+                <tr class="skill-description-row">
+                    <td colspan="6"><span>${escapeHtml(skill.description)}${skill.category ? ` [${escapeHtml(skill.category)}]` : ''}${skill.tags.length > 0 ? ` ${t('tags')}: ${escapeHtml(skill.tags.join(', '))}` : ''}</span></td>
                 </tr>`,
         )
         .join('');
@@ -203,6 +205,9 @@ export function renderDashboard(
         th { color: var(--muted); font-weight: 600; font-size: 12px; }
         tr:hover td { background: var(--row); }
         tr:last-child td { border-bottom: 0; }
+        .skill-main-row td { border-bottom: 0; padding-bottom: 3px; }
+        .skill-description-row td { padding-top: 0; }
+        .skill-description-row span { margin-top: 0; }
         .empty { color: var(--muted); text-align: center; padding: 20px; }
         .badge { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; border: 1px solid var(--border); }
         .ready { color: var(--vscode-testing-iconPassed); }
@@ -244,7 +249,7 @@ export function renderDashboard(
 
         <section>
             <div class="section-head"><h2>${t('skills')}</h2><button data-command="diagnoseSkills" class="secondary">${t('diagnose')}</button></div>
-            <table><thead><tr><th>${t('skill')}</th><th>${t('status')}</th><th>${t('score')}</th><th>${t('files')}</th><th>${t('size')}</th><th>${t('path')}</th><th></th></tr></thead><tbody>${renderSkillRows(data.skills)}</tbody></table>
+            <table><thead><tr><th>${t('skill')}</th><th>${t('status')}</th><th>${t('files')}</th><th>${t('size')}</th><th>${t('path')}</th><th></th></tr></thead><tbody>${renderSkillRows(data.skills)}</tbody></table>
         </section>
 
         <section>
