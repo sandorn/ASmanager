@@ -1,4 +1,8 @@
-node_modules/
-.vscode-test/
-*.vsix
-.DS_Store
+.vscode/**
+.vscode-test/**
+src/**
+.gitignore
+tsconfig.json
+**/*.map
+.venv/**
+docs/**

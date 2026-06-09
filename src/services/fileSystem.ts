@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { parse, ParseError } from 'jsonc-parser';
 
 async function pathExists(targetPath: string): Promise<boolean> {
     try {
@@ -63,17 +64,15 @@ export async function readJsonFile<T>(
     }
 
     const raw = await fs.readFile(targetPath, 'utf8');
-    try {
+    const errors: ParseError[] = [];
+    const result = parse(raw, errors, { allowTrailingComma: true }) as T;
+
+    if (errors.length > 0) {
+        // Fall back to standard JSON parse for better error messages
         return JSON.parse(raw) as T;
-    } catch {
-        // Try JSONC — strip single-line comments and trailing commas
-        const cleaned = raw
-            .split(/\r?\n/)
-            .map((line) => line.replace(/\/\/.*$/, '').trim())
-            .join('\n')
-            .replace(/,(\s*[}\]])/g, '$1');
-        return JSON.parse(cleaned) as T;
     }
+
+    return result;
 }
 
 export async function writeJsonFile(

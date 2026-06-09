@@ -68,6 +68,7 @@ const englishMessages = {
     destination: 'Destination',
     time: 'Time',
     notChecked: 'Not checked',
+    manageSources: 'Manage Sources',
 } as const;
 
 const chineseMessages: Record<MessageKey, string> = {
@@ -136,6 +137,7 @@ const chineseMessages: Record<MessageKey, string> = {
     destination: '目标',
     time: '时间',
     notChecked: '未检查',
+    manageSources: '管理来源',
 };
 
 export function isChineseLanguage(): boolean {

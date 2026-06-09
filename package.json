@@ -2,7 +2,7 @@
     "name": "asmanager",
     "displayName": "ASmanager",
     "description": "%extension.description%",
-    "version": "0.0.1",
+    "version": "0.2.0",
     "publisher": "Sandhill",
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
@@ -25,9 +25,7 @@
                     "type": "array",
                     "default": [
                         "https://github.com/anthropics/skills",
-                        "https://github.com/openai/skills",
-                        "https://github.com/MoizIbnYousaf/Ai-Agent-Skills",
-                        "https://github.com/heilcheng/awesome-agent-skills"
+                        "https://github.com/openai/skills"
                     ],
                     "items": {
                         "type": "string"
@@ -87,6 +85,11 @@
                 "icon": "$(dashboard)"
             },
             {
+                "command": "agentSkillsManager.manageSources",
+                "title": "%command.manageSources.title%",
+                "icon": "$(settings-gear)"
+            },
+            {
                 "command": "agentSkillsManager.addSource",
                 "title": "%command.addSource.title%",
                 "icon": "$(add)"
@@ -139,11 +142,6 @@
             {
                 "command": "agentSkillsManager.clearSyncRecords",
                 "title": "%command.clearSyncRecords.title%",
-                "icon": "$(clear-all)"
-            },
-            {
-                "command": "agentSkillsManager.cleanupLegacySyncs",
-                "title": "%command.cleanupLegacySyncs.title%",
                 "icon": "$(clear-all)"
             },
             {
@@ -290,5 +288,8 @@
         "@types/vscode": "^1.95.0",
         "@vscode/vsce": "^3.2.1",
         "typescript": "^5.7.2"
+    },
+    "dependencies": {
+        "jsonc-parser": "^3.3.1"
     }
 }

@@ -231,6 +231,7 @@ export function renderDashboard(
             </div>
             <div class="toolbar">
                 <button data-command="refresh">${t('refresh')}</button>
+                <button data-command="manageSources">${t('manageSources')}</button>
                 <button data-command="updateSources">${t('updateSources')}</button>
                 <button data-command="installSkillFromSource">${t('installSkill')}</button>
                 <button data-command="syncSkillToAgents">${t('syncToAgents')}</button>
@@ -253,7 +254,7 @@ export function renderDashboard(
         </section>
 
         <section>
-            <div class="section-head"><h2>${t('sources')}</h2><button data-command="addSource" class="secondary">${t('addSource')}</button></div>
+            <div class="section-head"><h2>${t('sources')}</h2><div style="display:flex;gap:8px"><button data-command="manageSources" class="secondary">${t('manageSources')}</button><button data-command="addSource" class="secondary">${t('addSource')}</button></div></div>
             <table><thead><tr><th>${t('sourceLabel')}</th><th>${t('status')}</th><th>${t('detail')}</th><th></th></tr></thead><tbody>${renderSourceRows(data.sources)}</tbody></table>
         </section>
 

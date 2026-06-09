@@ -32,6 +32,31 @@ export interface SourceInfo {
     detail?: string;
 }
 
+/** 技能源目录项 */
+export interface SkillSourceEntry {
+    id: string;
+    name: string;
+    maintainer: string;
+    url: string;
+    description: string;
+    category: SkillSourceCategory;
+    /** 是否为非 git 仓库来源（如平台链接） */
+    isPlatform?: boolean;
+}
+
+/** 源分类 */
+export type SkillSourceCategory = 'official' | 'community' | 'platform';
+
+/** 源分类的显示信息 */
+export interface SkillSourceCategoryInfo {
+    key: SkillSourceCategory;
+    label: string;
+    labelZh: string;
+    icon: string;
+    description: string;
+    descriptionZh: string;
+}
+
 export interface SourceSkillInfo {
     name: string;
     description: string;

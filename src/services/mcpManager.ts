@@ -273,10 +273,8 @@ export class McpManager {
     }
 
     async healthCheckAll(servers: McpServerInfo[]): Promise<McpServerInfo[]> {
-        const results: McpServerInfo[] = [];
-        for (const server of servers) {
-            results.push(await this.healthCheck(server));
-        }
-        return results;
+        return Promise.all(
+            servers.map((server) => this.healthCheck(server)),
+        );
     }
 }

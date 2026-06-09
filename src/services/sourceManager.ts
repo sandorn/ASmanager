@@ -145,19 +145,26 @@ export class SourceManager {
         onProgress?: (url: string, index: number, total: number) => void,
     ): Promise<string[]> {
         const updated: string[] = [];
+        const errors: Array<{ url: string; message: string }> = [];
         for (let index = 0; index < urls.length; index += 1) {
             const url = urls[index];
             onProgress?.(url, index + 1, urls.length);
             try {
                 updated.push(await this.update(url));
             } catch (error) {
-                throw new Error(
-                    localize(
-                        `Failed to update ${url}: ${String(error)}`,
-                        `更新 ${url} 失败：${String(error)}`,
-                    ),
-                );
+                errors.push({ url, message: String(error) });
             }
+        }
+        if (errors.length > 0) {
+            const details = errors
+                .map((e) => `- ${e.url}: ${e.message}`)
+                .join('\n');
+            throw new Error(
+                localize(
+                    `Failed to update ${errors.length} source(s):\n${details}`,
+                    `更新 ${errors.length} 个来源失败：\n${details}`,
+                ),
+            );
         }
         return updated;
     }
